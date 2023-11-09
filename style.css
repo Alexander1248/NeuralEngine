@@ -1,0 +1,9 @@
+body {
+    background-color: rgb(12, 22, 33);
+    color: #fff;
+}
+
+.menu-container {
+    display: flex;
+    justify-content: space-around;
+}
