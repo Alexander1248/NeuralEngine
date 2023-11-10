@@ -48,4 +48,10 @@ public class MatMul extends Instruction {
 
         addVariable(args[0], var2.width(), var1.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                matmul <out> <in1> <in2>""";
+    }
 }

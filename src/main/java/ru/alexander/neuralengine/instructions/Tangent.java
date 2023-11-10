@@ -47,4 +47,10 @@ public class Tangent extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                tangent <out> <in> <force>""";
+    }
 }

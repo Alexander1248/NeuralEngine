@@ -9,6 +9,8 @@ import java.io.IOException;
 public class App {
     public static void main(String[] args) throws IOException {
         NeuralEngine engine = new NeuralEngine();
+        System.out.println(engine.getDocumentation());
+
         engine.addVariable("in", 128, 128);
         engine.addVariable("cw1", 5, 5);
         engine.addVariable("cw2", 5, 5);

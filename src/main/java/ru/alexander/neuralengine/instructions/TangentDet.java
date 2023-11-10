@@ -47,4 +47,10 @@ public class TangentDet extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                tangent_det <out> <in> <force>""";
+    }
 }

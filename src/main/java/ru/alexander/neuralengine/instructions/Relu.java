@@ -49,4 +49,10 @@ public class Relu extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                relu <out> <in> <positive coefficient> <negative coefficient>""";
+    }
 }

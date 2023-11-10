@@ -50,4 +50,10 @@ public class Mul extends Instruction {
 
         addVariable(args[0], var1.width(), var1.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                mul <out> <in1> <in2>""";
+    }
 }

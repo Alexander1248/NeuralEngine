@@ -47,4 +47,10 @@ public class Softmax extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                softmax <out> <in> <force>""";
+    }
 }

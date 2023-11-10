@@ -165,7 +165,25 @@ __global__ void tensorSub(int width, int height,
 }
 
 extern "C"
- __global__ void concatenate(int width1, int width2, int height,
+ __global__ void concatenateVertical(int width, int height1, int height2,
+             float* in1, float* in2, float* out) {
+     int x = blockIdx.x * blockDim.x + threadIdx.x;
+     int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+     if (x < width && y < height1 + height2) {
+         int pos = x + y * width;
+
+        if (y < height1)
+            out[pos] = in1[x + y * width];
+        else {
+            y -= height1;
+            out[pos] = in2[x + y * width];
+        }
+     }
+}
+
+extern "C"
+ __global__ void concatenateHorizontal(int width1, int width2, int height,
              float* in1, float* in2, float* out) {
      int x = blockIdx.x * blockDim.x + threadIdx.x;
      int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -181,6 +199,7 @@ extern "C"
         }
      }
 }
+
 
 extern "C"
 __global__ void tensorMul(int width, int height,

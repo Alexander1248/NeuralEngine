@@ -25,13 +25,17 @@ public class NeuralEngine extends GpuExecutor {
 
         loadFunction("tensorAdd", "mtxOperations");
         loadFunction("tensorSub", "mtxOperations");
-        loadFunction("concatenate", "mtxOperations");
         loadFunction("tensorMul", "mtxOperations");
         loadFunction("tensorDiv", "mtxOperations");
         loadFunction("matrixMul", "mtxOperations");
+
+        loadFunction("concatenateVertical", "mtxOperations");
+        loadFunction("concatenateHorizontal", "mtxOperations");
+
         loadFunction("matrixConvEmptyBorder", "mtxOperations");
         loadFunction("matrixConvExtendBorder", "mtxOperations");
         loadFunction("matrixConvRepeatBorder", "mtxOperations");
+
         loadFunction("maxPooling", "mtxOperations");
         loadFunction("minPooling", "mtxOperations");
         loadFunction("avgPooling", "mtxOperations");

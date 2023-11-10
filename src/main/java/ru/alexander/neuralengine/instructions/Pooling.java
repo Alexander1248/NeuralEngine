@@ -76,4 +76,10 @@ public class Pooling extends Instruction {
 
         addVariable(args[0], var.width() / rate, var.height() / rate);
     }
+
+    @Override
+    public String documentation() {
+        return """
+                pooling <out> <in> <pooling rate> <pooling type>""";
+    }
 }

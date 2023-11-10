@@ -72,4 +72,10 @@ public class Conv extends Instruction {
 
         addVariable(args[0], var1.width(), var1.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                conv <out> <in1> <matrix> <border type>""";
+    }
 }

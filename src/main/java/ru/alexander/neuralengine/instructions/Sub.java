@@ -50,4 +50,10 @@ public class Sub extends Instruction {
 
         addVariable(args[0], var1.width(), var1.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                sub <out> <in1> <in2>""";
+    }
 }

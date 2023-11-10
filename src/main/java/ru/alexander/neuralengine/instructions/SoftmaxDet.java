@@ -47,4 +47,10 @@ public class SoftmaxDet extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                softmax_det <out> <in> <force>""";
+    }
 }

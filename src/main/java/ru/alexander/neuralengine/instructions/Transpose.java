@@ -40,4 +40,10 @@ public class Transpose extends Instruction {
 
         addVariable(args[0], var.height(), var.width());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                transpose <out> <in>""";
+    }
 }

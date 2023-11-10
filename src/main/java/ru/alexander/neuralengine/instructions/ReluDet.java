@@ -49,4 +49,10 @@ public class ReluDet extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                relu_det <out> <in> <positive coefficient> <negative coefficient>""";
+    }
 }

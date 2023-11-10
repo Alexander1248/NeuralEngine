@@ -47,4 +47,10 @@ public class Sigmoid extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                sigmoid <out> <in> <force>""";
+    }
 }

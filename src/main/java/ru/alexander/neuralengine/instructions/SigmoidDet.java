@@ -47,4 +47,10 @@ public class SigmoidDet extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+
+    @Override
+    public String documentation() {
+        return """
+                sigmoid_det <out> <in> <force>""";
+    }
 }

@@ -36,4 +36,10 @@ public class Linearize extends Instruction {
 
         addVariable(args[0], var.width() * var.height(), 1);
     }
+
+    @Override
+    public String documentation() {
+        return """
+                linearize <out> <in>""";
+    }
 }

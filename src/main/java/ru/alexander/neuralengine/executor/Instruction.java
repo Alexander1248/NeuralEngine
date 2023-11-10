@@ -15,6 +15,7 @@ public abstract class Instruction {
     public abstract String getInstructionName();
     public abstract void compute(String... args);
     public abstract void addOutputVariable(String... args);
+    public abstract String documentation();
 
     public Matrix getVariable(String name) {
         return executor.getVariableData(name);

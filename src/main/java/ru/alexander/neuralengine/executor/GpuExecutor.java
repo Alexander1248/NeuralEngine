@@ -179,6 +179,13 @@ public class GpuExecutor {
         return mxCellRenderer.createBufferedImage(adapter, null, 2, Color.white, true, null);
     }
 
+    public String getDocumentation() {
+        StringBuilder builder = new StringBuilder();
+        instructions.forEach((name, instruction) ->
+                builder.append(instruction.documentation()).append("\n"));
+        return builder.toString();
+    }
+
     public void clearMemory() {
         vars.forEach((name, mtx) -> cuMemFree(mtx.pointer()));
         vars.clear();
