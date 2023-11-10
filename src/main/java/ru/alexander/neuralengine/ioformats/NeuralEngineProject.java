@@ -1,7 +1,6 @@
 package ru.alexander.neuralengine.ioformats;
 
 import ru.alexander.neuralengine.executor.GpuExecutor;
-import ru.alexander.neuralengine.executor.ProjectIOFormat;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

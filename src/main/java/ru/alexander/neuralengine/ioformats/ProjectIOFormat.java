@@ -1,5 +1,9 @@
-package ru.alexander.neuralengine.executor;
+package ru.alexander.neuralengine.ioformats;
 
+
+import ru.alexander.neuralengine.executor.GpuExecutor;
+import ru.alexander.neuralengine.executor.Instruction;
+import ru.alexander.neuralengine.executor.Matrix;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

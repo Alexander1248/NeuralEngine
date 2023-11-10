@@ -9,6 +9,7 @@ import jcuda.driver.*;
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import ru.alexander.neuralengine.ioformats.ProjectIOFormat;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
