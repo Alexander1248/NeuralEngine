@@ -40,6 +40,9 @@ public class Transpose extends Instruction {
 
         addVariable(args[0], var.height(), var.width());
     }
+    public String getOutputVariableArg(String... args) {
+        return args[0];
+    }
 
     @Override
     public String documentation() {

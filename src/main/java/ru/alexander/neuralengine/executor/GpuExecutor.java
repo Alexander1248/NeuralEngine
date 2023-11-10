@@ -1,11 +1,7 @@
 package ru.alexander.neuralengine.executor;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.mxPartitionLayout;
-import com.mxgraph.layout.orthogonal.mxOrthogonalLayout;
 import com.mxgraph.util.mxCellRenderer;
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -16,8 +12,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -46,6 +41,38 @@ public class GpuExecutor {
         context = new CUcontext();
         cuCtxCreate(context, 0, device);
     }
+
+    public void loadProject(String filepath, ProjectIOFormat format) throws IOException {
+        int pos = filepath.indexOf(".");
+        if (pos == -1) throw new IOException("File without format");
+        if (!format.isRightFormat(filepath.substring(pos + 1)))
+            throw new IOException("Wrong file format!");
+
+        clearMemory();
+        format.load(new FileInputStream(filepath), this);
+    }
+    public void saveProject(String filepath, ProjectIOFormat format) throws IOException {
+        int pos = filepath.indexOf(".");
+        if (pos == -1) throw new IOException("File without format!");
+        if (!format.isRightFormat(filepath.substring(pos + 1)))
+            throw new IOException("Wrong file format!");
+
+        ProjectIOFormat.Data data = new ProjectIOFormat.Data();
+        data.instructions = instructions;
+        data.vars = new HashMap<>(vars);
+
+        for (int i = 0; i < code.length; i++)
+            data.vars.remove(instructions.get(code[i].instruction())
+                    .getOutputVariableArg(code[i].args()));
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < code.length; i++)
+            builder.append(code[i]).append("\n");
+        data.code = builder.toString();
+
+        format.save(new FileOutputStream(filepath), data, this);
+    }
+
 
     public void loadModule(String moduleName, String filepath) {
         CUmodule module = new CUmodule();
@@ -78,6 +105,9 @@ public class GpuExecutor {
     public void addInstruction(Instruction instruction) {
         instructions.put(instruction.getInstructionName(), instruction);
     }
+    public boolean hasInstruction(String instructionName) {
+        return instructions.containsKey(instructionName);
+    }
 
 
     public void addVariable(String name, int width, int height) {
@@ -96,6 +126,16 @@ public class GpuExecutor {
         if (mtx == null)
             throw new IllegalStateException("Variable not exists: " + name);
         return mtx;
+    }
+    boolean hasVariable(String name) {
+        return vars.containsKey(name);
+    }
+    void removeVariable(String name) {
+        Matrix mtx = vars.get(name);
+        if (mtx == null) return;
+
+        cuMemFree(mtx.pointer());
+        vars.remove(name);
     }
     public float[] getVariable(String name) {
         Matrix mtx = vars.get(name);
@@ -125,6 +165,8 @@ public class GpuExecutor {
             Instruction inst = instructions.get(desc.instruction());
             if (inst == null)
                 throw new IllegalStateException("Instruction not exists:" + desc.instruction());
+
+            removeVariable(inst.getOutputVariableArg(desc.args()));
             inst.addOutputVariable(desc.args());
             instDesc.add(desc);
         }
@@ -198,7 +240,6 @@ public class GpuExecutor {
         clearMemory();
     }
 
-
     Map<String, CUfunction> getFunctions() {
         return functions;
     }
@@ -207,5 +248,15 @@ public class GpuExecutor {
         return vars;
     }
 
-    private record InstructionDescription(String instruction, String[] args) {}
+    private record InstructionDescription(String instruction, String[] args) {
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(instruction);
+            for (int i = 0; i < args.length; i++)
+                builder.append(" ").append(args[i]);
+            return builder.toString();
+        }
+    }
 }

@@ -47,6 +47,9 @@ public class SigmoidDet extends Instruction {
 
         addVariable(args[0], var.width(), var.height());
     }
+    public String getOutputVariableArg(String... args) {
+        return args[0];
+    }
 
     @Override
     public String documentation() {

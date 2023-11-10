@@ -15,12 +15,20 @@ public abstract class Instruction {
     public abstract String getInstructionName();
     public abstract void compute(String... args);
     public abstract void addOutputVariable(String... args);
+    public abstract String getOutputVariableArg(String... args);
     public abstract String documentation();
 
-    public Matrix getVariable(String name) {
+
+    protected boolean hasVariable(String name) {
+        return executor.hasVariable(name);
+    }
+    protected void removeVariable(String name) {
+        executor.removeVariable(name);
+    }
+    protected Matrix getVariable(String name) {
         return executor.getVariableData(name);
     }
-    public void addVariable(String name, int width, int height) {
+    protected void addVariable(String name, int width, int height) {
         executor.addVariable(name, width, height);
     }
     protected void startGPUTask(

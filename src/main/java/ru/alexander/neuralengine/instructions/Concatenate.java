@@ -53,6 +53,7 @@ public class Concatenate extends Instruction {
 
         if (var1 == null || var2 == null)
             throw new IllegalStateException("Variable not exists!");
+
         switch (args[3]) {
             case "vertical", "v" -> {
                 if (var1.height() != var2.height())
@@ -69,6 +70,9 @@ public class Concatenate extends Instruction {
             }
             default -> throw new IllegalStateException("Wrong border type!");
         }
+    }
+    public String getOutputVariableArg(String... args) {
+        return args[0];
     }
 
     @Override

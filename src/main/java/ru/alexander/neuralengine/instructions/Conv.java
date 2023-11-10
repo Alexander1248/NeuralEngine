@@ -72,6 +72,9 @@ public class Conv extends Instruction {
 
         addVariable(args[0], var1.width(), var1.height());
     }
+    public String getOutputVariableArg(String... args) {
+        return args[0];
+    }
 
     @Override
     public String documentation() {
