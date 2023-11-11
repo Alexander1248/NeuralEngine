@@ -22,6 +22,10 @@ public abstract class Instruction {
     protected boolean hasVariable(String name) {
         return executor.hasVariable(name);
     }
+    protected boolean variableSizeIsEqual(String name, int width, int height) {
+        Matrix mtx = executor.getVariableData(name);
+        return mtx.width() == width && mtx.height() == height;
+    }
     protected void removeVariable(String name) {
         executor.removeVariable(name);
     }

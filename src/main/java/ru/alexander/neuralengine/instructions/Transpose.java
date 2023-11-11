@@ -38,6 +38,10 @@ public class Transpose extends Instruction {
         if (var == null)
             throw new IllegalStateException("Variable not exists!");
 
+        if (hasVariable(args[0])
+                && !variableSizeIsEqual(args[0], var.height(), var.width()))
+            throw new IllegalStateException("Variable reformat error!");
+
         removeVariable(args[0]);
         addVariable(args[0], var.height(), var.width());
     }

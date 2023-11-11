@@ -46,6 +46,10 @@ public class MatMul extends Instruction {
         if (var1.width() != var2.height())
             throw new IllegalStateException("Wrong sizes for matrix multiplication!");
 
+        if (hasVariable(args[0])
+                && !variableSizeIsEqual(args[0], var2.width(), var1.height()))
+            throw new IllegalStateException("Variable reformat error!");
+
         removeVariable(args[0]);
         addVariable(args[0], var2.width(), var1.height());
     }

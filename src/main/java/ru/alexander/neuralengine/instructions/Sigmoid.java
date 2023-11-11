@@ -45,6 +45,10 @@ public class Sigmoid extends Instruction {
             throw new IllegalStateException("Instruction format error!");
         }
 
+        if (hasVariable(args[0])
+                && !variableSizeIsEqual(args[0], var.width(), var.height()))
+            throw new IllegalStateException("Variable reformat error!");
+
         removeVariable(args[0]);
         addVariable(args[0], var.width(), var.height());
     }

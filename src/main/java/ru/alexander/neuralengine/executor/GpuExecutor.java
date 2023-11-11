@@ -211,7 +211,11 @@ public class GpuExecutor {
                     graph.addVertex(name);
                     vert = name;
                 }
-                else vert = list.get(Math.max(0, list.size() - 2));
+                else {
+                    if (instruction.args[0].equals(arg))
+                        vert = list.get(Math.max(0, list.size() - 2));
+                    else  vert = list.get(list.size() - 1);
+                }
                 graph.addEdge(vert, node);
             }
         }

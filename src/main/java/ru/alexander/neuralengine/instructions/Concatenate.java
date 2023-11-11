@@ -59,12 +59,20 @@ public class Concatenate extends Instruction {
                 if (var1.height() != var2.height())
                     throw new IllegalStateException("Heights not equal!");
 
+                if (hasVariable(args[0])
+                        && !variableSizeIsEqual(args[0], var1.width() + var2.width(), var1.height()))
+                    throw new IllegalStateException("Variable reformat error!");
+
                 removeVariable(args[0]);
                 addVariable(args[0], var1.width() + var2.width(), var1.height());
             }
             case "horizontal", "h" -> {
                 if (var1.width() != var2.width())
                     throw new IllegalStateException("Widths not equal!");
+
+                if (hasVariable(args[0])
+                        && !variableSizeIsEqual(args[0], var1.width(), var1.height() + var2.height()))
+                    throw new IllegalStateException("Variable reformat error!");
 
                 removeVariable(args[0]);
                 addVariable(args[0], var1.width(), var1.height() + var2.height());

@@ -69,6 +69,10 @@ public class Conv extends Instruction {
         if (var1 == null || var2 == null)
             throw new IllegalStateException("Variable not exists!");
 
+        if (hasVariable(args[0])
+                && !variableSizeIsEqual(args[0], var1.width(), var1.height()))
+            throw new IllegalStateException("Variable reformat error!");
+
         removeVariable(args[0]);
         addVariable(args[0], var1.width(), var1.height());
     }
