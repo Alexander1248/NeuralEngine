@@ -167,7 +167,6 @@ public class GpuExecutor {
             if (inst == null)
                 throw new IllegalStateException("Instruction not exists:" + desc.instruction());
 
-            removeVariable(inst.getOutputVariableArg(desc.args()));
             inst.addOutputVariable(desc.args());
             instDesc.add(desc);
         }
@@ -195,9 +194,10 @@ public class GpuExecutor {
 
             for (int j = 1; j < instruction.args.length; j++) {
                 String arg = instruction.args[j];
-                String vert = graph.vertexSet().stream()
-                        .filter(s -> s.endsWith(" " + arg + " ")).findAny().orElse(null);
-                if (vert == null) {
+                List<String> list = graph.vertexSet().stream()
+                        .filter(s -> s.endsWith(" " + arg + " ")).toList();
+                String vert;
+                if (list.isEmpty()) {
                     String name = "";
                     if (vars.containsKey(arg)) {
                         name = " mtx \n";
@@ -211,6 +211,7 @@ public class GpuExecutor {
                     graph.addVertex(name);
                     vert = name;
                 }
+                else vert = list.get(Math.max(0, list.size() - 2));
                 graph.addEdge(vert, node);
             }
         }

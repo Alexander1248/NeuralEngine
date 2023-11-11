@@ -69,7 +69,7 @@ public class Conv extends Instruction {
         if (var1 == null || var2 == null)
             throw new IllegalStateException("Variable not exists!");
 
-
+        removeVariable(args[0]);
         addVariable(args[0], var1.width(), var1.height());
     }
     public String getOutputVariableArg(String... args) {

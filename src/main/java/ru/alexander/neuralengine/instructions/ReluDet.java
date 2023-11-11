@@ -47,6 +47,7 @@ public class ReluDet extends Instruction {
             throw new IllegalStateException("Instruction format error!");
         }
 
+        removeVariable(args[0]);
         addVariable(args[0], var.width(), var.height());
     }
     public String getOutputVariableArg(String... args) {

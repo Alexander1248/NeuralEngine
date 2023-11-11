@@ -74,6 +74,7 @@ public class Pooling extends Instruction {
         if (var.height() % rate != 0)
             throw new IllegalStateException("Height is not divisible!");
 
+        removeVariable(args[0]);
         addVariable(args[0], var.width() / rate, var.height() / rate);
     }
     public String getOutputVariableArg(String... args) {

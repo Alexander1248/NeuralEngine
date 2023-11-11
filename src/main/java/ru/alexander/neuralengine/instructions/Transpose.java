@@ -38,6 +38,7 @@ public class Transpose extends Instruction {
         if (var == null)
             throw new IllegalStateException("Variable not exists!");
 
+        removeVariable(args[0]);
         addVariable(args[0], var.height(), var.width());
     }
     public String getOutputVariableArg(String... args) {
