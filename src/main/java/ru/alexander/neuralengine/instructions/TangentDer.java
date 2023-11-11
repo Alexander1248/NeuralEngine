@@ -5,14 +5,14 @@ import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
 
-public class SigmoidDet extends Instruction {
-    public SigmoidDet(GpuExecutor executor) {
+public class TangentDer extends Instruction {
+    public TangentDer(GpuExecutor executor) {
         super(executor);
     }
 
     @Override
     public String getInstructionName() {
-        return "sigmoid_det";
+        return "tangent_der";
     }
 
     @Override
@@ -20,7 +20,7 @@ public class SigmoidDet extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.sigmoidDet",
+        startGPUTask("mtxOperations.tangentDer",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),
@@ -59,6 +59,6 @@ public class SigmoidDet extends Instruction {
     @Override
     public String documentation() {
         return """
-                sigmoid_det <out> <in> <force>""";
+                tangent_det <out> <in> <force>""";
     }
 }

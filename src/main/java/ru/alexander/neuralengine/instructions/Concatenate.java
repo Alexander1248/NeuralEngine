@@ -22,7 +22,7 @@ public class Concatenate extends Instruction {
         Matrix in2 = getVariable(args[2]);
         switch (args[3]) {
             case "vertical", "v" -> startGPUTask("mtxOperations.concatenateVertical",
-                    in1.width() + in2.width(), in1.height(), 1,
+                    in1.width(), in1.height() + in2.height(), 1,
                     Pointer.to(new int[]{in1.width()}),
                     Pointer.to(new int[]{in1.height()}),
                     Pointer.to(new int[]{in2.height()}),

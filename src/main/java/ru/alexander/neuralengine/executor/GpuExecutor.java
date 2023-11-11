@@ -34,7 +34,7 @@ public class GpuExecutor {
     private InstructionDescription[] code;
 
     public GpuExecutor() {
-        setExceptionsEnabled(true);
+//        setExceptionsEnabled(true);
 
         cuInit(0);
         CUdevice device = new CUdevice();
@@ -174,10 +174,12 @@ public class GpuExecutor {
     }
 
     public void compute() {
+        cuCtxSynchronize();
         for (int i = 0; i < code.length; i++) {
             Instruction instruction = instructions.get(code[i].instruction());
             instruction.compute(code[i].args());
         }
+        cuCtxSynchronize();
     }
     public BufferedImage visualize(boolean withSizes) {
         DefaultDirectedGraph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
@@ -239,11 +241,11 @@ public class GpuExecutor {
         vars.clear();
     }
     public void close() {
+        clearMemory();
+
         for (Map.Entry<String, CUmodule> entry : scripts.entrySet())
             cuModuleUnload(entry.getValue());
         cuCtxDestroy(context);
-
-        clearMemory();
     }
 
     Map<String, CUfunction> getFunctions() {
@@ -252,6 +254,19 @@ public class GpuExecutor {
 
     Map<String, Matrix> getVariables() {
         return vars;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        GpuExecutor that = (GpuExecutor) object;
+
+        if (!Objects.equals(vars, that.vars)) return false;
+        for (String s : vars.keySet())
+            if (!Arrays.equals(getVariable(s), that.getVariable(s))) return false;
+
+        return Objects.equals(instructions, that.instructions) && Arrays.equals(code, that.code);
     }
 
     private record InstructionDescription(String instruction, String[] args) {
@@ -263,6 +278,21 @@ public class GpuExecutor {
             for (int i = 0; i < args.length; i++)
                 builder.append(" ").append(args[i]);
             return builder.toString();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            InstructionDescription that = (InstructionDescription) object;
+            return Objects.equals(instruction, that.instruction) && Arrays.equals(args, that.args);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(instruction);
+            result = 31 * result + Arrays.hashCode(args);
+            return result;
         }
     }
 }

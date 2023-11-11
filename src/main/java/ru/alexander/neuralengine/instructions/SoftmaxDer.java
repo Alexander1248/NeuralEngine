@@ -5,14 +5,14 @@ import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
 
-public class TangentDet extends Instruction {
-    public TangentDet(GpuExecutor executor) {
+public class SoftmaxDer extends Instruction {
+    public SoftmaxDer(GpuExecutor executor) {
         super(executor);
     }
 
     @Override
     public String getInstructionName() {
-        return "tangent_det";
+        return "softmax_der";
     }
 
     @Override
@@ -20,7 +20,7 @@ public class TangentDet extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.tangentDet",
+        startGPUTask("mtxOperations.softmaxDer",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),
@@ -59,6 +59,6 @@ public class TangentDet extends Instruction {
     @Override
     public String documentation() {
         return """
-                tangent_det <out> <in> <force>""";
+                softmax_det <out> <in> <force>""";
     }
 }

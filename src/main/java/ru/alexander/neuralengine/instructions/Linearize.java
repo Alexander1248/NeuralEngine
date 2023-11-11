@@ -22,7 +22,7 @@ public class Linearize extends Instruction {
     public void compute(String... args) {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
-        cuMemcpyDtoD(out.pointer(), in.pointer(), (long) Sizeof.FLOAT * in.width());
+        cuMemcpyDtoD(out.pointer(), in.pointer(), (long) Sizeof.FLOAT * in.width() * in.height());
     }
 
     @Override

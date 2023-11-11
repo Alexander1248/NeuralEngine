@@ -5,14 +5,14 @@ import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
 
-public class ReluDet extends Instruction {
-    public ReluDet(GpuExecutor executor) {
+public class ReluDer extends Instruction {
+    public ReluDer(GpuExecutor executor) {
         super(executor);
     }
 
     @Override
     public String getInstructionName() {
-        return "relu_det";
+        return "relu_der";
     }
 
     @Override
@@ -20,7 +20,7 @@ public class ReluDet extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.reluDet",
+        startGPUTask("mtxOperations.reluDer",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),

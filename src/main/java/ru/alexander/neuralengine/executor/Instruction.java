@@ -3,7 +3,11 @@ package ru.alexander.neuralengine.executor;
 import jcuda.Pointer;
 import jcuda.driver.CUfunction;
 
+import java.util.Objects;
+
+import static jcuda.driver.CUresult.CUDA_SUCCESS;
 import static jcuda.driver.JCudaDriver.*;
+import static jcuda.runtime.JCuda.cudaStreamSynchronize;
 
 public abstract class Instruction {
     private final GpuExecutor executor;
@@ -43,18 +47,36 @@ public abstract class Instruction {
         if (func == null) throw new IllegalStateException("Function not exists!");
 
         int lx = Math.min(sx, 16);
-        int gx = (sx >>> 4) + 1;
+        int gx = (int) Math.ceil((double) sx / 16);
 
         int ly = Math.min(sy, 16);
-        int gy = (sy >>> 4) + 1;
+        int gy = (int) Math.ceil((double) sy / 16);
 
         int lz = Math.min(sz, 4);
-        int gz = (sz >>> 2) + 1;
+        int gz = (int) Math.ceil((double) sz / 4);
 
         cuCtxSynchronize();
-        cuLaunchKernel(func,
+        int code = cuLaunchKernel(func,
                 lx, ly, lz,
                 gx, gy, gz,
                 0, null, Pointer.to(params), null);
+        if (code != CUDA_SUCCESS) {
+            String[] pStr = new String[1];
+            cuGetErrorString(code, pStr);
+            System.out.println(pStr[0]);
+        }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Instruction that = (Instruction) object;
+        return getInstructionName().equals(that.getInstructionName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getInstructionName().hashCode();
     }
 }

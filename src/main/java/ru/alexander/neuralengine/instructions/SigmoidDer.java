@@ -5,14 +5,14 @@ import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
 
-public class SoftmaxDet extends Instruction {
-    public SoftmaxDet(GpuExecutor executor) {
+public class SigmoidDer extends Instruction {
+    public SigmoidDer(GpuExecutor executor) {
         super(executor);
     }
 
     @Override
     public String getInstructionName() {
-        return "softmax_det";
+        return "sigmoid_der";
     }
 
     @Override
@@ -20,7 +20,7 @@ public class SoftmaxDet extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.softmaxDet",
+        startGPUTask("mtxOperations.sigmoidDer",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),
@@ -59,6 +59,6 @@ public class SoftmaxDet extends Instruction {
     @Override
     public String documentation() {
         return """
-                softmax_det <out> <in> <force>""";
+                sigmoid_det <out> <in> <force>""";
     }
 }

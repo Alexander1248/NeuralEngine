@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class NeuralEngine extends GpuExecutor {
 
-    //    nvcc -m64 -arch=all-major -fatbin matrices.cu -o matrices.fatbin
+    //    nvcc -arch=all-major -fatbin matrices.cu -o matrices.fatbin
     public NeuralEngine() throws IOException {
         super();
         loadModuleFromResources("mtxOperations", "kernels/matrices.fatbin");
@@ -16,10 +16,10 @@ public class NeuralEngine extends GpuExecutor {
         loadFunction("tangent", "mtxOperations");
         loadFunction("softmax", "mtxOperations");
 
-        loadFunction("reluDet", "mtxOperations");
-        loadFunction("sigmoidDet", "mtxOperations");
-        loadFunction("tangentDet", "mtxOperations");
-        loadFunction("softmaxDet", "mtxOperations");
+        loadFunction("reluDer", "mtxOperations");
+        loadFunction("sigmoidDer", "mtxOperations");
+        loadFunction("tangentDer", "mtxOperations");
+        loadFunction("softmaxDer", "mtxOperations");
 
         loadFunction("transpose", "mtxOperations");
 
@@ -49,14 +49,16 @@ public class NeuralEngine extends GpuExecutor {
         addInstruction(new Mul(this));
         addInstruction(new Pooling(this));
         addInstruction(new Relu(this));
-        addInstruction(new ReluDet(this));
+        addInstruction(new ReluDer(this));
         addInstruction(new Sigmoid(this));
-        addInstruction(new SigmoidDet(this));
+        addInstruction(new SigmoidDer(this));
         addInstruction(new Softmax(this));
-        addInstruction(new SoftmaxDet(this));
+        addInstruction(new SoftmaxDer(this));
         addInstruction(new Sub(this));
         addInstruction(new Tangent(this));
-        addInstruction(new TangentDet(this));
+        addInstruction(new TangentDer(this));
         addInstruction(new Transpose(this));
     }
+
+
 }
