@@ -13,10 +13,8 @@ import ru.alexander.neuralengine.ioformats.ProjectIOFormat;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.*;
 
@@ -25,10 +23,11 @@ import static jcuda.driver.JCudaDriver.*;
 public class GpuExecutor {
     // GPU System catalogs
     private final CUcontext context;
-    private final Map<String, CUmodule> scripts = new HashMap<>();
+    private final Map<String, CUmodule> modules = new HashMap<>();
     private final Map<String, CUfunction> functions = new HashMap<>();
 
     // Compilation and execution instructions
+    private final Map<String, String[]> scripts = new HashMap<>();
     private final Map<String, Instruction> instructions = new HashMap<>();
 
     // Code parameters
@@ -77,10 +76,25 @@ public class GpuExecutor {
     }
 
 
+    public void addScript(String scriptMask, String script) {
+        int pos = scriptMask.indexOf(" ");
+        if (pos == -1) pos = scriptMask.length();
+        scripts.put(scriptMask.substring(0, pos), new String[] { scriptMask.substring(pos + 1), script });
+    }
+    public void loadScript(String filepath) throws IOException {
+        FileInputStream reader = new FileInputStream(filepath);
+        String data = new String(reader.readAllBytes()).replace("\r", "");
+        reader.close();
+        int pos = data.indexOf("\n");
+        addScript(data.substring(0, pos), data.substring(pos));
+    }
+    public void removeScript(String scriptMask) {
+        scripts.remove(scriptMask);
+    }
     public void loadModule(String moduleName, String filepath) {
         CUmodule module = new CUmodule();
         cuModuleLoad(module, filepath);
-        scripts.put(moduleName, module);
+        modules.put(moduleName, module);
     }
     public void loadModuleFromResources(String moduleName, String filepath) throws IOException {
         CUmodule module = new CUmodule();
@@ -92,10 +106,10 @@ public class GpuExecutor {
         cuModuleLoadData(module, stream.readAllBytes());
         stream.close();
 
-        scripts.put(moduleName, module);
+        modules.put(moduleName, module);
     }
     public void loadFunction(String functionName, String moduleName) {
-        CUmodule module = scripts.get(moduleName);
+        CUmodule module = modules.get(moduleName);
         if (module == null)
             throw new IllegalStateException("Module not exists!");
 
@@ -150,17 +164,32 @@ public class GpuExecutor {
     }
 
     public void compile(String code) {
-        String[] segments = code.replace("\r", "").split("\n");
+        LinkedList<String> segments = new LinkedList<>(List.of(code.replace("\r", "").split("\n")));
 
         List<InstructionDescription> instDesc = new ArrayList<>();
-        for (int i = 0; i < segments.length; i++) {
-            int pos = segments[i].indexOf("//");
-            if (pos == -1) pos = segments[i].length();
+        while (!segments.isEmpty()) {
+            String segment = segments.pollFirst();
+            int pos = segment.indexOf("//");
+            if (pos == -1) pos = segment.length();
 
-            String instructionPart = segments[i].substring(0, pos);
+            String instructionPart = segment.substring(0, pos);
             if (instructionPart.isEmpty()) continue;
 
             String[] instruction = instructionPart.split(" ");
+
+            String[] script = scripts.get(instruction[0]);
+            if (script != null)  {
+                String codeBlock = script[1].replace("\r", "");
+                String[] args = script[0].split(" ");
+                for (int j = 0; j < args.length; j++)
+                    codeBlock = codeBlock.replace(" " + args[j], " " + instruction[j + 1]);
+
+                String[] codeFrags = codeBlock.split("\n");
+                for (int j = codeFrags.length - 1; j >= 0; j--)
+                    segments.addFirst(codeFrags[j]);
+                continue;
+            }
+
             InstructionDescription desc = new InstructionDescription(
                     instruction[0],
                     Arrays.copyOfRange(instruction, 1, instruction.length)
@@ -243,7 +272,7 @@ public class GpuExecutor {
     public void close() {
         clearMemory();
 
-        for (Map.Entry<String, CUmodule> entry : scripts.entrySet())
+        for (Map.Entry<String, CUmodule> entry : modules.entrySet())
             cuModuleUnload(entry.getValue());
         cuCtxDestroy(context);
     }
