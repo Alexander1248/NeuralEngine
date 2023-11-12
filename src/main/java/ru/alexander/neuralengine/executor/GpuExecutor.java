@@ -13,10 +13,12 @@ import ru.alexander.neuralengine.ioformats.ProjectIOFormat;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-
+import java.util.*;
 
 import static jcuda.driver.JCudaDriver.*;
 
@@ -34,7 +36,7 @@ public class GpuExecutor {
     private InstructionDescription[] code;
 
     public GpuExecutor() {
-//        setExceptionsEnabled(true);
+        setExceptionsEnabled(true);
 
         cuInit(0);
         CUdevice device = new CUdevice();
@@ -174,12 +176,10 @@ public class GpuExecutor {
     }
 
     public void compute() {
-        cuCtxSynchronize();
         for (int i = 0; i < code.length; i++) {
             Instruction instruction = instructions.get(code[i].instruction());
             instruction.compute(code[i].args());
         }
-        cuCtxSynchronize();
     }
     public BufferedImage visualize(boolean withSizes) {
         DefaultDirectedGraph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);

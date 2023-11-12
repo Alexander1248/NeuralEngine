@@ -1,18 +1,38 @@
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import ru.alexander.neuralengine.NeuralEngine;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class ExecutionTests extends TestCase {
-    private static final int width = 100;
-    private static final int height = 100;
+public class ExecutionTests {
+    private static final long timeout = 30000;
+
+
+    private static final int width = 1000;
+    private static final int height = 1000;
     private static final int size = width * height;
 
     private static final float err = 1e-3f;
+
+    private static final double tScale = 1e-6;
+
+
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            System.out.println();
+            System.out.println("Test: " + description.getMethodName().substring(4));
+        }
+    };
+
+    @Test(timeout = timeout)
     public void testAdd() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -33,12 +53,15 @@ public class ExecutionTests extends TestCase {
                 add out in1 in2
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testSub() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -59,12 +82,15 @@ public class ExecutionTests extends TestCase {
                 sub out in1 in2
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testMul() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -85,12 +111,15 @@ public class ExecutionTests extends TestCase {
                 mul out in1 in2
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testDiv() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -111,12 +140,15 @@ public class ExecutionTests extends TestCase {
                 div out in1 in2
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testTranspose() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -134,12 +166,15 @@ public class ExecutionTests extends TestCase {
                 transpose out in
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testLinearize() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -157,14 +192,19 @@ public class ExecutionTests extends TestCase {
                 linearize out in
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
-    public void testMatMul() throws IOException {
+
+//    @Ignore
+    @Test(timeout = timeout)
+    public void testMatMul1() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -193,7 +233,48 @@ public class ExecutionTests extends TestCase {
                 matmul out in1 in2
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        assertArrayEquals(out, cOut, err);
+    }
+//    @Ignore
+    @Test(timeout = timeout)
+    public void testMatMul2() throws IOException {
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in1 = new float[size];
+        float[] in2 = new float[size];
+
+        float[] out = new float[height * height];
+        for (int i = 0; i < size; i++) {
+            in1[i] = random.nextFloat() * 2 - 1;
+            in2[i] = random.nextFloat() * 2 - 1;
+        }
+
+        for (int i = 0; i < height * height; i++) {
+            int x = i % height;
+            int y = i / height;
+
+            out[i] = 0;
+            for (int j = 0; j < width; j++)
+                out[i] += in1[j + y * width] * in2[x + j * height];
+        }
+
+        engine.addVariable("in1", width, height, in1);
+        engine.addVariable("in2", height, width, in2);
+
+        engine.compile("""
+                matmul out in1 in2
+                """);
+
+        long t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
@@ -201,6 +282,7 @@ public class ExecutionTests extends TestCase {
     }
 
 
+    @Test(timeout = timeout)
     public void testRelu() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -219,12 +301,15 @@ public class ExecutionTests extends TestCase {
                 relu out in 0.7 0.03
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testReluDer() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -243,13 +328,16 @@ public class ExecutionTests extends TestCase {
                 relu_der out in 0.7 0.03
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
+    @Test(timeout = timeout)
     public void testSigmoid() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -267,12 +355,15 @@ public class ExecutionTests extends TestCase {
                 sigmoid out in 0.8
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testSigmoidDer() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -291,13 +382,16 @@ public class ExecutionTests extends TestCase {
                 sigmoid_der out in 0.8
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
+    @Test(timeout = timeout)
     public void testTangent() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -315,12 +409,15 @@ public class ExecutionTests extends TestCase {
                 tangent out in 0.4
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testTangentDer() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -339,27 +436,30 @@ public class ExecutionTests extends TestCase {
                 tangent_der out in 0.8
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
+    @Test(timeout = timeout)
     public void testSoftmax() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
         float[] in = new float[size];
         float[] out = new float[size];
-        float sum = 0;
+        float[] sum = new float[height];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
             out[i] = (float) Math.exp(0.6 * in[i]);
-            sum += out[i];
+            sum[i / width] += out[i];
         }
         for (int i = 0; i < size; i++)
-            out[i] /= sum;
+            out[i] /= sum[i / width];
 
         engine.addVariable("in", width, height, in);
 
@@ -367,26 +467,30 @@ public class ExecutionTests extends TestCase {
                 softmax out in 0.6
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testSoftmaxDer() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
         float[] in = new float[size];
         float[] out = new float[size];
-        float sum = 0;
+        float[] sum = new float[height];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
             out[i] = (float) Math.exp(0.6 * in[i]);
-            sum += out[i];
+            sum[i / width] += out[i];
         }
         for (int i = 0; i < size; i++) {
-            out[i] = (sum - out[i]) * 0.6f * out[i] / (sum * sum);
+            int y = i / width;
+            out[i] = (sum[y] - out[i]) * 0.6f * out[i] / (sum[y] * sum[y]);
         }
 
         engine.addVariable("in", width, height, in);
@@ -395,7 +499,9 @@ public class ExecutionTests extends TestCase {
                 softmax_der out in 0.6
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
@@ -403,6 +509,7 @@ public class ExecutionTests extends TestCase {
     }
 
 
+    @Test(timeout = timeout)
     public void testConvEmB() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -443,12 +550,15 @@ public class ExecutionTests extends TestCase {
                 conv out in mtx empty
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testConvExB() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -485,12 +595,15 @@ public class ExecutionTests extends TestCase {
                 conv out in mtx extend
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testConvReB() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -531,13 +644,16 @@ public class ExecutionTests extends TestCase {
                 conv out in mtx repeat
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
+    @Test(timeout = timeout)
     public void testConcatenateVertical() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -561,12 +677,15 @@ public class ExecutionTests extends TestCase {
                 concatenate out in1 in2 vertical
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testConcatenateHorizontal() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -601,13 +720,16 @@ public class ExecutionTests extends TestCase {
                 concatenate out in1 in2 horizontal
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
 
+    @Test(timeout = timeout)
     public void testMinPooling() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -635,12 +757,15 @@ public class ExecutionTests extends TestCase {
                 pooling out in 2 min
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testMaxPooling() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -668,12 +793,15 @@ public class ExecutionTests extends TestCase {
                 pooling out in 2 max
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();
         assertArrayEquals(out, cOut, err);
     }
+    @Test(timeout = timeout)
     public void testAvgPooling() throws IOException {
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
@@ -701,7 +829,44 @@ public class ExecutionTests extends TestCase {
                 pooling out in 2 avg
                 """);
 
+        long t = System.nanoTime();
         engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        assertArrayEquals(out, cOut, err);
+    }
+
+    @Test(timeout = timeout)
+    public void testScript() throws IOException {
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in1 = new float[size];
+        float[] in2 = new float[size];
+
+        float[] out = new float[size];
+        for (int i = 0; i < size; i++) {
+            in1[i] = random.nextFloat() * 2 - 1;
+            in2[i] = random.nextFloat() * 2 - 1;
+            out[i] = (in1[i] + in2[i]) * (in1[i] - in2[i]);
+        }
+
+
+
+        engine.addVariable("in1", width, height, in1);
+        engine.addVariable("in2", width, height, in2);
+
+        engine.compile("""
+                add sum in1 in2
+                sub delta in1 in2
+                mul out sum delta
+                """);
+
+        long t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         float[] cOut = engine.getVariable("out");
         engine.close();

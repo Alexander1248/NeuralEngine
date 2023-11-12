@@ -53,7 +53,8 @@ __global__ void sigmoidDer(int width, int height,
         int pos = x + y * width;
         
         float val = exp(-force * in[pos]);
-        out[pos] = force * val / pow(1.0 + val, 2);
+        float vp1 = 1.0 + val;
+        out[pos] = force * val / (vp1 * vp1);
     }
 }
 
@@ -82,7 +83,8 @@ __global__ void tangentDer(int width, int height,
         int pos = x + y * width;
 
          float val = exp(-force * in[pos]);
-        out[pos] = 2.0 * force * val / pow(1.0 + val, 2);
+        float vp1 = 1.0 + val;
+        out[pos] = 2.0 * force * val / (vp1 * vp1);
     }
 }
 
@@ -95,13 +97,12 @@ __global__ void softmax(int width, int height,
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x < width && y < height) {
-        int pos = x + y * width;
-        
-        int size = width * height;
+        int yw = y * width;
+        int pos = x + yw;
 
         float sum = 0;
-        for (int i = 0; i < size; i++)
-            sum += exp(force * in[i]);
+        for (int i = 0; i < width; i++)
+            sum += exp(force * in[i + yw]);
 
         out[pos] = exp(force * in[pos]) / sum;
     }
@@ -114,13 +115,12 @@ __global__ void softmaxDer(int width, int height,
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x < width && y < height) {
-        int pos = x + y * width;
-
-        int size = width * height;
+        int yw = y * width;
+        int pos = x + yw;
         
         float sum = 0;
-        for (int i = 0; i < size; i++)
-            sum += exp(force * in[i]);
+        for (int i = 0; i < width; i++)
+            sum += exp(force * in[i + yw]);
 
         float e = exp(force * in[pos]);
         out[pos] =  force * e * (sum - e) / (sum * sum);

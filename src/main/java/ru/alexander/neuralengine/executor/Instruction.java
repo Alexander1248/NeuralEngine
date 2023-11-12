@@ -3,11 +3,8 @@ package ru.alexander.neuralengine.executor;
 import jcuda.Pointer;
 import jcuda.driver.CUfunction;
 
-import java.util.Objects;
-
-import static jcuda.driver.CUresult.CUDA_SUCCESS;
-import static jcuda.driver.JCudaDriver.*;
-import static jcuda.runtime.JCuda.cudaStreamSynchronize;
+import static jcuda.driver.JCudaDriver.cuCtxSynchronize;
+import static jcuda.driver.JCudaDriver.cuLaunchKernel;
 
 public abstract class Instruction {
     private final GpuExecutor executor;
@@ -46,25 +43,23 @@ public abstract class Instruction {
         CUfunction func = executor.getFunctions().get(function);
         if (func == null) throw new IllegalStateException("Function not exists!");
 
-        int lx = Math.min(sx, 16);
-        int gx = (int) Math.ceil((double) sx / 16);
+        int mod = sx / (int) Math.ceil((double) sx / 1023) + 1;
+        int lx = Math.min(sx, mod);
+        int gx = (int) Math.ceil((double) sx / mod);
 
-        int ly = Math.min(sy, 16);
-        int gy = (int) Math.ceil((double) sy / 16);
+        mod = sy / (int) Math.ceil((double) sy / 1023) + 1;
+        int ly = Math.min(sy, mod);
+        int gy = (int) Math.ceil((double) sy / mod);
 
-        int lz = Math.min(sz, 4);
-        int gz = (int) Math.ceil((double) sz / 4);
+        mod = sz / (int) Math.ceil((double) sz / 63) + 1;
+        int lz = Math.min(sz, mod);
+        int gz = (int) Math.ceil((double) sz / mod);
 
-        cuCtxSynchronize();
-        int code = cuLaunchKernel(func,
+        cuLaunchKernel(func,
                 lx, ly, lz,
                 gx, gy, gz,
                 0, null, Pointer.to(params), null);
-        if (code != CUDA_SUCCESS) {
-            String[] pStr = new String[1];
-            cuGetErrorString(code, pStr);
-            System.out.println(pStr[0]);
-        }
+        cuCtxSynchronize();
     }
 
     @Override
