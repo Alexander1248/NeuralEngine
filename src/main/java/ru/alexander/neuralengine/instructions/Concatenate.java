@@ -81,9 +81,10 @@ public class Concatenate extends Instruction {
             default -> throw new IllegalStateException("Wrong border type!");
         }
     }
-    public String[] getOutputVariableArgs(String... args) {
-        return new String[] { args[0] };
+    public int[] getOutputVariableArgs() {
+        return new int[] { 0 };
     }
+
 
     @Override
     public String documentation() {

@@ -55,8 +55,8 @@ public class Div extends Instruction {
         removeVariable(args[0]);
         addVariable(args[0], var1.width(), var1.height());
     }
-    public String[] getOutputVariableArgs(String... args) {
-        return new String[] { args[0] };
+    public int[] getOutputVariableArgs() {
+        return new int[] { 0 };
     }
 
     @Override
