@@ -33,6 +33,9 @@ public abstract class Instruction {
     protected Matrix getVariable(String name) {
         return executor.getVariableData(name);
     }
+    protected float[] getVariableMtx(String name) {
+        return executor.getVariable(name);
+    }
     protected void addVariable(String name, int width, int height) {
         executor.addVariable(name, width, height);
     }
