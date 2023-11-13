@@ -22,6 +22,7 @@ public class NeuralEngine extends GpuExecutor {
         loadFunction("softmaxDer", "mtxOperations");
 
         loadFunction("transpose", "mtxOperations");
+        loadFunction("set", "mtxOperations");
 
         loadFunction("tensorAdd", "mtxOperations");
         loadFunction("tensorSub", "mtxOperations");
@@ -58,6 +59,7 @@ public class NeuralEngine extends GpuExecutor {
         addInstruction(new Tangent(this));
         addInstruction(new TangentDer(this));
         addInstruction(new Transpose(this));
+        addInstruction(new Set(this));
     }
 
 
