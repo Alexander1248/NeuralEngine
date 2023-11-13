@@ -81,8 +81,8 @@ public class Pooling extends Instruction {
         removeVariable(args[0]);
         addVariable(args[0], var.width() / rate, var.height() / rate);
     }
-    public String getOutputVariableArg(String... args) {
-        return args[0];
+    public String[] getOutputVariableArgs(String... args) {
+        return new String[] { args[0] };
     }
 
     @Override

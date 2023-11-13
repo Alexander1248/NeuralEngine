@@ -16,7 +16,7 @@ public abstract class Instruction {
     public abstract String getInstructionName();
     public abstract void compute(String... args);
     public abstract void addOutputVariable(String... args);
-    public abstract String getOutputVariableArg(String... args);
+    public abstract String[] getOutputVariableArgs(String... args);
     public abstract String documentation();
 
 

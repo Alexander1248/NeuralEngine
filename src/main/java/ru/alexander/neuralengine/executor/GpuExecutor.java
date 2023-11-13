@@ -63,9 +63,12 @@ public class GpuExecutor {
         data.instructions = instructions;
         data.vars = new HashMap<>(vars);
 
-        for (int i = 0; i < code.length; i++)
-            data.vars.remove(instructions.get(code[i].instruction())
-                    .getOutputVariableArg(code[i].args()));
+        for (int i = 0; i < code.length; i++) {
+            String[] args = instructions.get(code[i].instruction())
+                    .getOutputVariableArgs(code[i].args());
+            for (int j = 0; j < args.length; j++)
+                data.vars.remove(args[j]);
+        }
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < code.length; i++)
@@ -176,6 +179,15 @@ public class GpuExecutor {
         float[] data = new float[mtx.width() * mtx.height()];
         cuMemcpyDtoH(Pointer.to(data), mtx.pointer(), (long) Sizeof.FLOAT * data.length);
         return data;
+    }
+    public int[] getVariableSizes(String name) {
+        Matrix mtx = vars.get(name);
+        if (mtx == null)
+            throw new IllegalStateException("Variable not exists!");
+        return new int[] {
+                mtx.width(),
+                mtx.height()
+        };
     }
 
     public void compile(String code) {

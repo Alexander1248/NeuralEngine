@@ -53,8 +53,8 @@ public class MatMul extends Instruction {
         removeVariable(args[0]);
         addVariable(args[0], var2.width(), var1.height());
     }
-    public String getOutputVariableArg(String... args) {
-        return args[0];
+    public String[] getOutputVariableArgs(String... args) {
+        return new String[] { args[0] };
     }
 
     @Override

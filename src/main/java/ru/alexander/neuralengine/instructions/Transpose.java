@@ -45,8 +45,8 @@ public class Transpose extends Instruction {
         removeVariable(args[0]);
         addVariable(args[0], var.height(), var.width());
     }
-    public String getOutputVariableArg(String... args) {
-        return args[0];
+    public String[] getOutputVariableArgs(String... args) {
+        return new String[] { args[0] };
     }
 
     @Override
