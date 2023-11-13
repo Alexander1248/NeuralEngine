@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 public class InstrumentTests {
     @Test
     public void testNEPSaveLoad() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
 
         engine.addVariable("in1", 100, 50);
@@ -38,11 +39,14 @@ public class InstrumentTests {
         NeuralEngine load = new NeuralEngine();
         load.loadProject("test.nep", new NeuralEngineProject());
 
+        engine.close();
+        NeuralEngine.closeCuda();
         assertEquals(engine, load);
     }
 
     @Test
     public void testNESSaveLoad() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
 
         engine.addVariable("in1", 100, 50);
@@ -60,12 +64,15 @@ public class InstrumentTests {
         NeuralEngine load = new NeuralEngine();
         load.loadProject("test.nes", new NeuralEngineScheme());
 
+        engine.close();
+        NeuralEngine.closeCuda();
         assertEquals(engine, load);
     }
 
     @Ignore
     @Test
     public void testScripts() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
 
         engine.addVariable("in1", 100, 50);
@@ -88,6 +95,9 @@ public class InstrumentTests {
                 """);
 
         ImageIO.write(engine.visualize(true), "png", new File("test.png"));
+
+        engine.close();
+        NeuralEngine.closeCuda();
     }
 
 
@@ -95,6 +105,7 @@ public class InstrumentTests {
     @Ignore
     @Test
     public void testVisualization() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         System.out.println(engine.getDocumentation());
 
@@ -109,6 +120,9 @@ public class InstrumentTests {
                 matmul out2 out1 out
                 """);
         ImageIO.write(engine.visualize(true), "png", new File("test.png"));
+
+        engine.close();
+        NeuralEngine.closeCuda();
     }
     @Ignore
     @Test

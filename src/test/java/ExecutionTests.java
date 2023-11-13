@@ -34,6 +34,7 @@ public class ExecutionTests {
 
     @Test(timeout = timeout)
     public void testAdd() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -59,10 +60,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testSub() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -88,10 +92,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testMul() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -117,10 +123,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testDiv() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -146,10 +154,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testTranspose() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -172,10 +182,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testLinearize() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -198,6 +210,7 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
@@ -205,6 +218,7 @@ public class ExecutionTests {
 //    @Ignore
     @Test(timeout = timeout)
     public void testMatMul1() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -239,11 +253,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 //    @Ignore
     @Test(timeout = timeout)
     public void testMatMul2() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -278,12 +294,14 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
 
     @Test(timeout = timeout)
     public void testRelu() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -307,10 +325,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testReluDer() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -334,11 +354,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testSigmoid() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -361,10 +383,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testSigmoidDer() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -388,11 +412,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testTangent() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -415,10 +441,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testTangentDer() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -442,11 +470,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testSoftmax() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -473,10 +503,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testSoftmaxDer() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -505,12 +537,14 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
 
     @Test(timeout = timeout)
     public void testConvEmB() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -556,10 +590,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testConvExB() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -601,10 +637,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testConvReB() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -650,11 +688,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testConcatenateVertical() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -683,10 +723,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testConcatenateHorizontal() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -726,11 +768,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testMinPooling() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -763,10 +807,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testMaxPooling() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -799,10 +845,12 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
     public void testAvgPooling() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -835,11 +883,13 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 
     @Test(timeout = timeout)
     public void testScript() throws IOException {
+        NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();
         Random random = new Random();
 
@@ -870,6 +920,7 @@ public class ExecutionTests {
 
         float[] cOut = engine.getVariable("out");
         engine.close();
+        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
 }
