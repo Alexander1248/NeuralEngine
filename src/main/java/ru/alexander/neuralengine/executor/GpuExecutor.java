@@ -64,10 +64,11 @@ public class GpuExecutor {
         data.vars = new HashMap<>(vars);
 
         for (int i = 0; i < code.length; i++) {
-            String[] args = instructions.get(code[i].instruction())
-                    .getOutputVariableArgs(code[i].args());
+            String[] a = code[i].args();
+            int[] args = instructions.get(code[i].instruction())
+                    .getOutputVariableArgs();
             for (int j = 0; j < args.length; j++)
-                data.vars.remove(args[j]);
+                data.vars.remove(a[args[j]]);
         }
 
         StringBuilder builder = new StringBuilder();
@@ -256,12 +257,13 @@ public class GpuExecutor {
     }
     public BufferedImage visualize(boolean withSizes) {
         DefaultDirectedGraph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        Map<String, List<String>> nOuts = new HashMap<>();
 
         for (int i = 0; i < code.length; i++) {
             InstructionDescription instruction = code[i];
             StringBuilder node = new StringBuilder(" " + instruction.instruction);
-            String[] args = instructions.get(instruction.instruction)
-                    .getOutputVariableArgs(instruction.args);
+            int[] args = instructions.get(instruction.instruction)
+                    .getOutputVariableArgs();
             for (int j = 0; j < args.length; j++) {
                 if (withSizes) {
                     Matrix mtx = vars.get(instruction.args[j]);
@@ -269,21 +271,25 @@ public class GpuExecutor {
                 }
                 node.append(" \n ").append(instruction.args[j]).append(" ");
             }
+            for (int j = 0; j < args.length; j++) {
+                if (!nOuts.containsKey(instruction.args[args[j]]))
+                    nOuts.put(instruction.args[args[j]], new ArrayList<>());
+                nOuts.get(instruction.args[args[j]]).add(node.toString());
+            }
             graph.addVertex(node.toString());
 
             traversal:
             for (int j = 0; j < instruction.args.length; j++) {
-                String arg = instruction.args[j];
-
                 for (int k = 0; k < args.length; k++)
-                    if (arg.equals(args[k]))
+                    if (args[k] == j)
                         continue traversal;
 
+                String arg = instruction.args[j];
 
-                List<String> list = graph.vertexSet().stream()
-                        .filter(s -> s.endsWith(" " + arg + " ")).toList();
+
+                List<String> list = nOuts.get(arg);
                 String vert;
-                if (list.isEmpty()) {
+                if (list == null || list.isEmpty()) {
                     String name = "";
                     if (vars.containsKey(arg)) {
                         name = " mtx \n";
@@ -294,13 +300,17 @@ public class GpuExecutor {
                     }
                     name += " " + arg + " ";
 
+                    if (!nOuts.containsKey(arg))
+                        nOuts.put(arg, new ArrayList<>());
+                    nOuts.get(arg).add(name);
+
                     graph.addVertex(name);
                     vert = name;
                 }
                 else {
                     if (instruction.args[0].equals(arg))
                         vert = list.get(Math.max(0, list.size() - 2));
-                    else  vert = list.get(list.size() - 1);
+                    else vert = list.get(list.size() - 1);
                 }
                 graph.addEdge(vert, node.toString());
             }
