@@ -264,10 +264,10 @@ public class GpuExecutor {
                     .getOutputVariableArgs(instruction.args);
             for (int j = 0; j < args.length; j++) {
                 if (withSizes) {
-                    Matrix mtx = vars.get(instruction.args[0]);
+                    Matrix mtx = vars.get(instruction.args[j]);
                     node.append(" \n ").append(mtx.width()).append(" ").append(mtx.height());
                 }
-                node.append(" \n ").append(instruction.args[0]).append(" ");
+                node.append(" \n ").append(instruction.args[j]).append(" ");
             }
             graph.addVertex(node.toString());
 
