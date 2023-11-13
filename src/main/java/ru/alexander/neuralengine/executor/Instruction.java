@@ -36,6 +36,9 @@ public abstract class Instruction {
     protected float[] getVariableMtx(String name) {
         return executor.getVariable(name);
     }
+    protected void loadDataInVariable(String name, float[] data) {
+        executor.loadDataInVariable(name, data);
+    }
     protected void addVariable(String name, int width, int height) {
         executor.addVariable(name, width, height);
     }
