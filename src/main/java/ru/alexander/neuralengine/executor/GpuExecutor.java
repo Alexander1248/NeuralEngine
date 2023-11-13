@@ -271,8 +271,15 @@ public class GpuExecutor {
             }
             graph.addVertex(node.toString());
 
-            for (int j = 1; j < instruction.args.length; j++) {
+            traversal:
+            for (int j = 0; j < instruction.args.length; j++) {
                 String arg = instruction.args[j];
+
+                for (int k = 0; k < args.length; k++)
+                    if (arg.equals(args[k]))
+                        continue traversal;
+
+
                 List<String> list = graph.vertexSet().stream()
                         .filter(s -> s.endsWith(" " + arg + " ")).toList();
                 String vert;
