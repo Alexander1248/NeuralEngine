@@ -259,13 +259,17 @@ public class GpuExecutor {
 
         for (int i = 0; i < code.length; i++) {
             InstructionDescription instruction = code[i];
-            String node =  " " + instruction.instruction;
-            if (withSizes) {
-                Matrix mtx = vars.get(instruction.args[0]);
-                node += " \n " + mtx.width() + " " + mtx.height();
+            StringBuilder node = new StringBuilder(" " + instruction.instruction);
+            String[] args = instructions.get(instruction.instruction)
+                    .getOutputVariableArgs(instruction.args[0]);
+            for (int j = 0; j < args.length; j++) {
+                if (withSizes) {
+                    Matrix mtx = vars.get(instruction.args[0]);
+                    node.append(" \n ").append(mtx.width()).append(" ").append(mtx.height());
+                }
+                node.append(" \n ").append(instruction.args[0]).append(" ");
             }
-            node += " \n " + instruction.args[0] + " ";
-            graph.addVertex(node);
+            graph.addVertex(node.toString());
 
             for (int j = 1; j < instruction.args.length; j++) {
                 String arg = instruction.args[j];
@@ -291,7 +295,7 @@ public class GpuExecutor {
                         vert = list.get(Math.max(0, list.size() - 2));
                     else  vert = list.get(list.size() - 1);
                 }
-                graph.addEdge(vert, node);
+                graph.addEdge(vert, node.toString());
             }
         }
 
