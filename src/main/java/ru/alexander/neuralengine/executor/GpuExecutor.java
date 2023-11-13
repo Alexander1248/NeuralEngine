@@ -261,7 +261,7 @@ public class GpuExecutor {
             InstructionDescription instruction = code[i];
             StringBuilder node = new StringBuilder(" " + instruction.instruction);
             String[] args = instructions.get(instruction.instruction)
-                    .getOutputVariableArgs(instruction.args[0]);
+                    .getOutputVariableArgs(instruction.args);
             for (int j = 0; j < args.length; j++) {
                 if (withSizes) {
                     Matrix mtx = vars.get(instruction.args[0]);
