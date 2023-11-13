@@ -3,7 +3,7 @@
   <groupId>ru.alexander</groupId>
   <artifactId>NeuralEngine</artifactId>
   <versioning>
-    <release>1.2.3</release>
+    <release>1.2.4</release>
     <versions>
       <version>1.0</version>
       <version>1.1.0</version>
@@ -15,7 +15,8 @@
       <version>1.2.1</version>
       <version>1.2.2</version>
       <version>1.2.3</version>
+      <version>1.2.4</version>
     </versions>
-    <lastUpdated>20231113214340</lastUpdated>
+    <lastUpdated>20231113220052</lastUpdated>
   </versioning>
 </metadata>
