@@ -3,23 +3,29 @@ package ru.alexander.neuralengine.instructions;
 import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 
-public abstract class AbstractFunctionInstruction extends Instruction {
-    private final GpuExecutor executor;
+import java.util.HashMap;
+import java.util.Map;
 
-    public AbstractFunctionInstruction(GpuExecutor root, GpuExecutor functionExecutor) {
+public abstract class AbstractFunctionInstruction extends Instruction {
+    private final Map<String[], GpuExecutor> executors = new HashMap<>();
+
+    public AbstractFunctionInstruction(GpuExecutor root) {
         super(root);
-        this.executor = functionExecutor;
     }
 
     @Override
     public void compute(String... args) {
         loadInstructions(args);
-        executor.compute();
+        executors.get(args).compute();
         unloadInstructions(args);
     }
 
-    protected GpuExecutor getFunctionExecutor() {
-        return executor;
+    public void newInstance(GpuExecutor executor, String... args) {
+        executors.put(args, executor);
+    }
+
+    protected GpuExecutor getFunctionExecutor(String... args) {
+        return executors.get(args);
     }
 
     public abstract void loadInstructions(String... args);
