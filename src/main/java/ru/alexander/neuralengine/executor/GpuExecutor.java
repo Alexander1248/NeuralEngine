@@ -138,6 +138,17 @@ public class GpuExecutor {
         addVariable(name, width, height);
         cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.FLOAT * width * height);
     }
+    public void loadDataInVariable(String name, float[] data) {
+        Matrix mtx = vars.get(name);
+        if (mtx == null)
+            throw new IllegalStateException("Matrix not exists!");
+
+        int size = mtx.width() * mtx.height();
+        if (data.length != size)
+            throw new IllegalStateException("Matrix size not compare to array size");
+        cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.FLOAT * size);
+    }
+
     Matrix getVariableData(String name) {
         Matrix mtx = vars.get(name);
         if (mtx == null)
@@ -183,6 +194,7 @@ public class GpuExecutor {
                 String codeBlock = script[1].replace("\r", "");
                 String argsLine = script[0];
 
+                // TODO: 13.11.2023 Fix after usage variables collision
                 for (String key : vars.keySet()) {
                     byte[] bytes = new byte[16];
                     random.nextBytes(bytes);
