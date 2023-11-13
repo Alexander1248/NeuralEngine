@@ -22,7 +22,6 @@ import static jcuda.driver.JCudaDriver.*;
 
 public class GpuExecutor {
     // GPU System catalogs
-    private final CUcontext context;
     private final Map<String, CUmodule> modules = new HashMap<>();
     private final Map<String, CUfunction> functions = new HashMap<>();
 
@@ -34,7 +33,8 @@ public class GpuExecutor {
     private final Map<String, Matrix> vars = new HashMap<>();
     private InstructionDescription[] code;
 
-    public GpuExecutor() {
+    private static CUcontext context;
+    public static void initCuda() {
         setExceptionsEnabled(true);
 
         cuInit(0);
@@ -42,6 +42,9 @@ public class GpuExecutor {
         cuDeviceGet(device, 0);
         context = new CUcontext();
         cuCtxCreate(context, 0, device);
+    }
+    public static void closeCuda() {
+        cuCtxDestroy(context);
     }
 
     public void loadProject(String filepath, ProjectIOFormat format) throws IOException {
@@ -339,7 +342,6 @@ public class GpuExecutor {
 
         for (Map.Entry<String, CUmodule> entry : modules.entrySet())
             cuModuleUnload(entry.getValue());
-        cuCtxDestroy(context);
     }
 
     Map<String, CUfunction> getFunctions() {
