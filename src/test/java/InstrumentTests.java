@@ -39,8 +39,6 @@ public class InstrumentTests {
         NeuralEngine load = new NeuralEngine();
         load.loadProject("test.nep", new NeuralEngineProject());
 
-        engine.close();
-        NeuralEngine.closeCuda();
         assertEquals(engine, load);
     }
 
@@ -64,8 +62,6 @@ public class InstrumentTests {
         NeuralEngine load = new NeuralEngine();
         load.loadProject("test.nes", new NeuralEngineScheme());
 
-        engine.close();
-        NeuralEngine.closeCuda();
         assertEquals(engine, load);
     }
 

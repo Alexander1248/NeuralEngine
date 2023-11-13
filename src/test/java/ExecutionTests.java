@@ -61,7 +61,6 @@ public class ExecutionTests {
         float[] cOut = engine.getVariable("out");
         engine.close();
         NeuralEngine.closeCuda();
-        NeuralEngine.closeCuda();
         assertArrayEquals(out, cOut, err);
     }
     @Test(timeout = timeout)
