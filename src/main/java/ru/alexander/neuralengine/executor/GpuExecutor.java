@@ -75,12 +75,13 @@ public class GpuExecutor {
         format.save(new FileOutputStream(filepath), data, this);
     }
 
-
+    @Deprecated
     public void addScript(String scriptMask, String script) {
         int pos = scriptMask.indexOf(" ");
         if (pos == -1) pos = scriptMask.length();
         scripts.put(scriptMask.substring(0, pos), new String[] { scriptMask.substring(pos + 1), script });
     }
+    @Deprecated
     public void loadScript(String filepath) throws IOException {
         FileInputStream reader = new FileInputStream(filepath);
         String data = new String(reader.readAllBytes()).replace("\r", "");
@@ -88,9 +89,12 @@ public class GpuExecutor {
         int pos = data.indexOf("\n");
         addScript(data.substring(0, pos), data.substring(pos));
     }
+    @Deprecated
     public void removeScript(String scriptMask) {
         scripts.remove(scriptMask);
     }
+
+
     public void loadModule(String moduleName, String filepath) {
         CUmodule module = new CUmodule();
         cuModuleLoad(module, filepath);
