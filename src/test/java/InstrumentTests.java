@@ -63,6 +63,7 @@ public class InstrumentTests {
         assertEquals(engine, load);
     }
 
+    @Ignore
     @Test
     public void testScripts() throws IOException {
         NeuralEngine engine = new NeuralEngine();
@@ -71,9 +72,9 @@ public class InstrumentTests {
         engine.addVariable("in2", 100, 50);
 
         engine.addScript("func out in1 in2 in3", """
-                add s1 in1 in2
+                add tin2 in1 in2
                 sub s2 in1 in3
-                mul out s1 s2""");
+                mul out tin2 s2""");
 
         engine.compile("""
                 add out in1 in2

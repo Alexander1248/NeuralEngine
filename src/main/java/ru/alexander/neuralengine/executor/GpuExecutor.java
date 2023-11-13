@@ -164,6 +164,7 @@ public class GpuExecutor {
     }
 
     public void compile(String code) {
+        Random random = new Random();
         LinkedList<String> segments = new LinkedList<>(List.of(code.replace("\r", "").split("\n")));
 
         List<InstructionDescription> instDesc = new ArrayList<>();
@@ -180,7 +181,22 @@ public class GpuExecutor {
             String[] script = scripts.get(instruction[0]);
             if (script != null)  {
                 String codeBlock = script[1].replace("\r", "");
-                String[] args = script[0].split(" ");
+                String argsLine = script[0];
+
+                for (String key : vars.keySet()) {
+                    byte[] bytes = new byte[16];
+                    random.nextBytes(bytes);
+                    String s;
+                    do {
+                        s = Base64.getEncoder().encodeToString(bytes);
+                    } while (vars.containsKey(s));
+                    if (argsLine.startsWith(key))
+                        argsLine = argsLine.replaceFirst(key, "_" + s);
+                    argsLine = argsLine.replace(" " + key, " _" + s);
+                    codeBlock = codeBlock.replace(" " + key, " _" + s);
+                }
+
+                String[] args = argsLine.split(" ");
                 for (int j = 0; j < args.length; j++)
                     codeBlock = codeBlock.replace(" " + args[j], " " + instruction[j + 1]);
 
