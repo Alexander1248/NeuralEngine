@@ -887,6 +887,36 @@ public class ExecutionTests {
     }
 
     @Test(timeout = timeout)
+    public void testSum() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in = new float[size];
+
+        float[] out = new float[1];
+        for (int i = 0; i < size; i++) {
+            in[i] = random.nextFloat() * 2 - 1;
+            out[0] += in[i];
+        }
+
+        engine.addVariable("in", width, height, in);
+
+        engine.compile("""
+                sum out in
+                """);
+
+        long t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        NeuralEngine.closeCuda();
+        assertArrayEquals(out, cOut, 0.1f);
+    }
+
+    @Test(timeout = timeout)
     public void testScript() throws IOException {
         NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();

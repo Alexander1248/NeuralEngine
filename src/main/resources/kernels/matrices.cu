@@ -139,6 +139,59 @@ __global__ void transpose(int width, int height,
         out[x + y * width] = in[y + x * height];
     }
 }
+
+extern "C"
+__global__ void flipX(int width, int height,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        out[x + y * width] = in[(width - 1 - x) + y * width];
+    }
+}
+extern "C"
+__global__ void flipY(int width, int height,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        out[x + y * width] = in[x + (height - 1 - y) * width];
+    }
+}
+
+extern "C"
+__global__ void rotate90(int width, int height,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        out[x + y * width] = in[(height - 1 - y) + x * height];
+    }
+}
+extern "C"
+__global__ void rotate180(int width, int height,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        out[x + y * width] = in[(width - 1 - x) + (height - 1 - y) * width];
+    }
+}
+extern "C"
+__global__ void rotate270(int width, int height,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        out[x + y * width] = in[y + (width - 1 - x) * height];
+    }
+}
+
 extern "C"
 __global__ void set(int width, int height, float value,
             float* out) {
@@ -147,6 +200,16 @@ __global__ void set(int width, int height, float value,
 
     if (x < width && y < height) {
         out[x + y * width] = value;
+    }
+}
+
+extern "C"
+__global__ void sum(int size, float* mtx) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (x < size) {
+        mtx[x] += mtx[x + size];
+        mtx[x + size] = 0;
     }
 }
 
@@ -280,6 +343,62 @@ __global__ void matrixConvEmptyBorder(int width, int height, int mx, int my,
         out[x + y * width] = sum;
     }
 }
+extern "C"
+__global__ void matrixConvEmptyBorderBackpropagationErrorTraversal(int width, int height, int mx, int my,
+            float* currError, float* matrix, float* prevError) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        float sum = 0;
+        for (int dy = 0; dy < mx; dy++) {
+            int py = y + my - 1 - dy - hy;
+            if (py < 0) continue;
+            if (py >= height) continue;
+
+            for (int dx = 0; dx < mx; dx++) {
+               int px = x + mx - 1 - dx - hx;
+                if (px < 0) continue;
+                if (px >= width) continue;
+
+                sum += currError[px + py * width] * matrix[dx + dy * width];
+            }
+        }
+        prevError[x + y * width] = sum;
+    }
+}
+extern "C"
+__global__ void matrixConvEmptyBorderBackpropagationWeightCorrection(int width, int height, int mx, int my, float ls,
+            float* input, float* error, float* matrix) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < mx && y < my) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        int sx = x - hx;
+        int sy = y - hy;
+
+        float sum = 0;
+        for (int dy = 0; dy < height; dy++) {
+            int py = dy - sy;
+            if (py < 0) continue;
+            if (py >= height) continue;
+            for (int dx = 0; dx < width; dx++) {
+                int px = dx - sx;
+                if (px < 0) continue;
+                if (px >= width) continue;
+                sum += error[dx + dy * width] * input[px + py * width];
+            }
+        }
+        matrix[x + y * width] = sum * ls;
+    }
+}
+
 
 extern "C"
 __global__ void matrixConvExtendBorder(int width, int height, int mx, int my,
@@ -304,6 +423,53 @@ __global__ void matrixConvExtendBorder(int width, int height, int mx, int my,
         out[x + y * width] = sum;
     }
 }
+extern "C"
+__global__ void matrixConvExtendBorderBackpropagationErrorTraversal(int width, int height, int mx, int my,
+            float* in, float* matrix, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        float sum = 0;
+        for (int dy = 0; dy < mx; dy++) {
+            int py = max(0, min(height - 1, y + my - 1 - dy - hy));
+
+            for (int dx = 0; dx < mx; dx++) {
+                int px = max(0, min(width - 1, x + mx - 1 - dx - hx));
+
+                sum += in[px + py * width] * matrix[dx + dy * mx];
+            }
+        }
+        out[x + y * width] = sum;
+    }
+}
+extern "C"
+__global__ void matrixConvExtendBorderBackpropagationWeightCorrection(int width, int height, int mx, int my, float ls,
+            float* input, float* error, float* matrix) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < mx && y < my) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        int sx = x - hx;
+        int sy = y - hy;
+
+        float sum = 0;
+        for (int dy = 0; dy < height; dy++)
+            for (int dx = 0; dx < width; dx++) {
+                int px = max(0, min(width - 1, dx - sx));
+                int py = max(0, min(height - 1, dy - sy));
+                sum += error[dx + dy * width] * input[px + py * width];
+            }
+        matrix[x + y * width] = sum * ls;
+    }
+}
+
 
 extern "C"
 __global__ void matrixConvRepeatBorder(int width, int height, int mx, int my,
@@ -330,6 +496,61 @@ __global__ void matrixConvRepeatBorder(int width, int height, int mx, int my,
             }
         }
         out[x + y * width] = sum;
+    }
+}
+extern "C"
+__global__ void matrixConvRepeatBorderBackpropagationErrorTraversal(int width, int height, int mx, int my,
+            float* in, float* matrix, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        float sum = 0;
+        for (int dy = 0; dy < mx; dy++) {
+            int py = y + my - 1 - dy - hy;
+            if (py < 0) py += height;
+            if (py >= height) py -= height;
+
+            for (int dx = 0; dx < mx; dx++) {
+                int px = x + mx - 1 - dx - hx;
+                if (px < 0) px += width;
+                if (px >= width) px -= width;
+
+                sum += in[px + py * width] * matrix[dx + dy * mx];
+            }
+        }
+        out[x + y * width] = sum;
+    }
+}
+extern "C"
+__global__ void matrixConvRepeatBorderBackpropagationWeightCorrection(int width, int height, int mx, int my, float ls,
+            float* input, float* error, float* matrix) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < mx && y < my) {
+        int hx = mx >> 1;
+        int hy = my >> 1;
+
+        int sx = x - hx;
+        int sy = y - hy;
+
+        float sum = 0;
+        for (int dy = 0; dy < height; dy++) {
+            int py = dy - sy;
+            if (py < 0) py += height;
+            if (py >= height) py -= height;
+            for (int dx = 0; dx < width; dx++) {
+                int px = dx - sx;
+                if (px < 0) px += width;
+                if (px >= width) px -= width;
+                sum += error[dx + dy * width] * input[px + py * width];
+            }
+        }
+        matrix[x + y * width] = sum * ls;
     }
 }
 
@@ -375,6 +596,24 @@ __global__ void minPooling(int width, int height,
     }
 }
 extern "C"
+__global__ void maxminPoolingBackpropagation(int width, int height, int rate,
+            float* in, float* out, 
+            float* errorNext, float* errorPrev) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        int rx = x / rate;
+        int ry = y / rate;
+        int rw = width / rate;
+
+        errorPrev[x + y * width] = 0;
+        if (abs(in[x + y * width] - out[rx + ry * rw]) < 1e-5) 
+            errorPrev[x + y * width] = errorNext[rx + ry * width];
+    }
+}
+
+extern "C"
 __global__ void avgPooling(int width, int height,
             int rate,
             float* in, float* out) {
@@ -392,5 +631,20 @@ __global__ void avgPooling(int width, int height,
                 val += in[(rx + dx) + (ry + dy) * rw];
 
         out[x + y * width] = val / (rate * rate);
+    }
+}
+extern "C"
+__global__ void avgPoolingBackpropagation(int width, int height, int rate,
+            float* in, float* out, 
+            float* errorNext, float* errorPrev) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        int rx = x / rate;
+        int ry = y / rate;
+        int rw = width / rate;
+
+        errorPrev[x + y * width] = errorNext[rx + ry * width] * in[x + y + width] / (out[rx + ry * rw] * rate * rate);
     }
 }
