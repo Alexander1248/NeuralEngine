@@ -18,9 +18,10 @@ public class ConvBackprop extends Instruction {
     @Override
     public void compute(String... args) {
         Matrix prevError = getVariable(args[0]);
-        Matrix in = getVariable(args[1]);
-        Matrix currError = getVariable(args[2]);
-        Matrix mtx = getVariable(args[3]);
+        Matrix mtxDelta = getVariable(args[1]);
+        Matrix in = getVariable(args[2]);
+        Matrix currError = getVariable(args[3]);
+        Matrix mtx = getVariable(args[4]);
 
 
         switch (args[3]) {
@@ -44,7 +45,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(new float[]{Float.parseFloat(args[4])}),
                         Pointer.to(in.pointer()),
                         Pointer.to(currError.pointer()),
-                        Pointer.to(mtx.pointer())
+                        Pointer.to(mtxDelta.pointer())
                 );
             }
             case "extend" -> {
@@ -67,7 +68,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(new float[]{Float.parseFloat(args[4])}),
                         Pointer.to(in.pointer()),
                         Pointer.to(currError.pointer()),
-                        Pointer.to(mtx.pointer())
+                        Pointer.to(mtxDelta.pointer())
                 );
             }
             case "repeat" -> {
@@ -87,10 +88,10 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(new int[]{in.height()}),
                         Pointer.to(new int[]{mtx.width()}),
                         Pointer.to(new int[]{mtx.height()}),
-                        Pointer.to(new float[]{Float.parseFloat(args[4])}),
+                        Pointer.to(new float[]{Float.parseFloat(args[5])}),
                         Pointer.to(in.pointer()),
                         Pointer.to(currError.pointer()),
-                        Pointer.to(mtx.pointer())
+                        Pointer.to(mtxDelta.pointer())
                 );
             }
         }
@@ -104,25 +105,30 @@ public class ConvBackprop extends Instruction {
         if (!args[5].equals("empty") && !args[5].equals("extend") && !args[5].equals("repeat"))
             throw new IllegalStateException("Wrong border type!");
 
-        Matrix var1 = getVariable(args[1]);
-        Matrix var2 = getVariable(args[2]);
-        Matrix var3 = getVariable(args[3]);
-
-        if (var1 == null || var2 == null || var3 == null)
-            throw new IllegalStateException("Variable not exists!");
+        Matrix in = getVariable(args[2]);
+        Matrix currError = getVariable(args[3]);
+        Matrix mtx = getVariable(args[4]);
 
         try {
-            Float.parseFloat(args[4]);
+            Float.parseFloat(args[5]);
         } catch (Exception ex) {
             throw new IllegalStateException("Instruction format error!");
         }
 
         if (hasVariable(args[0])
-                && !variableSizeIsEqual(args[0], var1.width(), var1.height()))
+                && !variableSizeIsEqual(args[0], mtx.height(), currError.height()))
+            throw new IllegalStateException("Variable reformat error!");
+
+
+        if (hasVariable(args[1])
+                && !variableSizeIsEqual(args[1], mtx.height(), currError.height()))
             throw new IllegalStateException("Variable reformat error!");
 
         removeVariable(args[0]);
-        addVariable(args[0], var1.width(), var1.height());
+        addVariable(args[0], in.width(), in.height());
+
+        removeVariable(args[1]);
+        addVariable(args[1], mtx.width(), mtx.height());
     }
     public int[] getOutputVariableArgs() {
         return new int[] { 0, 3 };
@@ -131,6 +137,6 @@ public class ConvBackprop extends Instruction {
     @Override
     public String documentation() {
         return """
-                conv_backprop <prev error> <input> <curr error> <matrix> <learning speed> <border type>""";
+                conv_backprop <prev error> <weights delta> <input> <curr error> <matrix> <learning speed> <border type>""";
     }
 }

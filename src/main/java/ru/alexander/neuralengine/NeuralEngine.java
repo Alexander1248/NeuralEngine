@@ -29,6 +29,7 @@ public class NeuralEngine extends GpuExecutor {
         loadFunction("rotate270", "mtxOperations");
         loadFunction("set", "mtxOperations");
         loadFunction("sum", "mtxOperations");
+        loadFunction("mul", "mtxOperations");
 
         loadFunction("tensorAdd", "mtxOperations");
         loadFunction("tensorSub", "mtxOperations");
