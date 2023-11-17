@@ -334,7 +334,7 @@ __global__ void matrixMulBackpropagationErrorTraversal(int w1w2, int height1, in
 
 extern "C"
 __global__ void matrixMulBackpropagationWeightCorrection(int width1, int width2, int h1h2, float learningSpeed,
-            float* input, float* error, float* weightsDelta) {
+            float* input, float* error, float* weights) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -344,7 +344,7 @@ __global__ void matrixMulBackpropagationWeightCorrection(int width1, int width2,
         for (int i = 0; i < h1h2; i++)
             sum += input[y + i * width1] * error[x + i * width2];
 
-        weightsDelta[x + y * width2] = sum * learningSpeed; 
+        weights[x + y * width2] -= sum * learningSpeed; 
     }
 }
 
@@ -407,7 +407,7 @@ __global__ void matrixConvEmptyBorderBackpropagationErrorTraversal(int width, in
 }
 extern "C"
 __global__ void matrixConvEmptyBorderBackpropagationWeightCorrection(int width, int height, int mx, int my, float ls,
-            float* input, float* error, float* matrixDelta) {
+            float* input, float* error, float* matrix) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -430,7 +430,7 @@ __global__ void matrixConvEmptyBorderBackpropagationWeightCorrection(int width, 
                 sum += error[dx + dy * width] * input[px + py * width];
             }
         }
-        matrixDelta[x + y * width] = sum * ls;
+        matrix[x + y * width] -= sum * ls;
     }
 }
 
@@ -483,7 +483,7 @@ __global__ void matrixConvExtendBorderBackpropagationErrorTraversal(int width, i
 }
 extern "C"
 __global__ void matrixConvExtendBorderBackpropagationWeightCorrection(int width, int height, int mx, int my, float ls,
-            float* input, float* error, float* matrixDelta) {
+            float* input, float* error, float* matrix) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -501,7 +501,7 @@ __global__ void matrixConvExtendBorderBackpropagationWeightCorrection(int width,
                 int py = max(0, min(height - 1, dy - sy));
                 sum += error[dx + dy * width] * input[px + py * width];
             }
-        matrixDelta[x + y * width] = sum * ls;
+        matrix[x + y * width] -= sum * ls;
     }
 }
 
@@ -585,7 +585,7 @@ __global__ void matrixConvRepeatBorderBackpropagationWeightCorrection(int width,
                 sum += error[dx + dy * width] * input[px + py * width];
             }
         }
-        matrix[x + y * width] = sum * ls;
+        matrix[x + y * width] -= sum * ls;
     }
 }
 
