@@ -75,7 +75,7 @@ public class MatMulBackprop extends Instruction {
         addVariable(args[0], weights.height(), currError.height());
     }
     public int[] getOutputVariableArgs() {
-        return new int[] { 0 };
+        return new int[] { 0, 3 };
     }
 
     @Override
