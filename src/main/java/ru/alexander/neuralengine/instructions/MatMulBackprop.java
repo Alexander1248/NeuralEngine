@@ -81,6 +81,6 @@ public class MatMulBackprop extends Instruction {
     @Override
     public String documentation() {
         return """
-                matmul <prev error> <input> <curr error> <weights> <learning speed>""";
+                matmul_backprop <prev error> <input> <curr error> <weights> <learning speed>""";
     }
 }

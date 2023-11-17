@@ -269,10 +269,10 @@ public class GpuExecutor {
                     .getOutputVariableArgs();
             for (int j = 0; j < args.length; j++) {
                 if (withSizes) {
-                    Matrix mtx = vars.get(instruction.args[j]);
+                    Matrix mtx = vars.get(instruction.args[args[j]]);
                     node.append(" \n ").append(mtx.width()).append(" ").append(mtx.height());
                 }
-                node.append(" \n ").append(instruction.args[j]).append(" ");
+                node.append(" \n ").append(instruction.args[args[j]]).append(" ");
             }
             for (int j = 0; j < args.length; j++) {
                 if (!nOuts.containsKey(instruction.args[args[j]]))

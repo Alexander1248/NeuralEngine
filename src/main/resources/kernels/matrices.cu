@@ -305,13 +305,11 @@ __global__ void matrixMul(int w1h2, int height1, int width2,
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x < width2 && y < height1) {
-        int pos = x + y * width2;
-
         float sum = 0.0;
         for (int i = 0; i < w1h2; i++)
             sum += in1[i + y * w1h2] * in2[x + i * width2];
 
-        out[pos] = sum;
+        out[x + y * width2] = sum;
     }
 }
 
@@ -322,13 +320,11 @@ __global__ void matrixMulBackpropagationErrorTraversal(int w1w2, int height1, in
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x < height2 && y < height1) {
-        int pos = x + y * height2;
-
         float sum = 0.0;
         for (int i = 0; i < w1w2; i++)
             sum += currError[i + y * w1w2] * weigts[i + x * w1w2];
 
-        prevError[pos] = sum;
+        prevError[x + y * height2] = sum;
     }
 }
 
