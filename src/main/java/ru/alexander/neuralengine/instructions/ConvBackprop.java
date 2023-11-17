@@ -19,8 +19,8 @@ public class ConvBackprop extends Instruction {
     public void compute(String... args) {
         Matrix prevError = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
-        Matrix currError = getVariable(args[1]);
-        Matrix mtx = getVariable(args[2]);
+        Matrix currError = getVariable(args[2]);
+        Matrix mtx = getVariable(args[3]);
 
 
         switch (args[3]) {
@@ -36,7 +36,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(prevError.pointer())
                 );
                 startGPUTask("mtxOperations.matrixConvEmptyBorderBackpropagationWeightCorrection",
-                        in.width(), in.height(), 1,
+                        mtx.width(), mtx.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
                         Pointer.to(new int[]{mtx.width()}),
@@ -59,7 +59,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(prevError.pointer())
                 );
                 startGPUTask("mtxOperations.matrixConvExtendBorderBackpropagationWeightCorrection",
-                        in.width(), in.height(), 1,
+                        mtx.width(), mtx.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
                         Pointer.to(new int[]{mtx.width()}),
