@@ -67,6 +67,7 @@ public class NeuralEngine extends GpuExecutor {
         addInstruction(new Div(this));
         addInstruction(new Linearize(this));
         addInstruction(new MatMul(this));
+        addInstruction(new MatMulBackprop(this));
         addInstruction(new Mul(this));
         addInstruction(new Pooling(this));
         addInstruction(new PoolingBackprop(this));
