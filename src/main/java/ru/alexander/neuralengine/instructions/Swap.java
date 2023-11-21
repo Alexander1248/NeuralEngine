@@ -1,18 +1,21 @@
 package ru.alexander.neuralengine.instructions;
 
 import jcuda.Pointer;
+import jcuda.Sizeof;
 import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
 
-public class Flip extends Instruction {
-    public Flip(GpuExecutor executor) {
+import static jcuda.driver.JCudaDriver.cuMemcpyDtoD;
+
+public class Swap extends Instruction {
+    public Swap(GpuExecutor executor) {
         super(executor);
     }
 
     @Override
     public String getInstructionName() {
-        return "flip";
+        return "swap";
     }
 
     @Override
@@ -20,18 +23,22 @@ public class Flip extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        switch (args[2]) {
-            case "x" -> startGPUTask("mtxOperations.flipX",
-                    in.width(), in.height(), 1,
+        cuMemcpyDtoD(out.pointer(), in.pointer(), (long) Sizeof.FLOAT * in.width() * in.height());
+        switch (args[4]) {
+            case "columns" -> startGPUTask("mtxOperations.swapColumns",
+                    in.height(), 1, 1,
                     Pointer.to(new int[] { in.width() }),
                     Pointer.to(new int[] { in.height() }),
+                    Pointer.to(new int[] { Integer.parseInt(args[2]) }),
+                    Pointer.to(new int[] { Integer.parseInt(args[3]) }),
                     Pointer.to(in.pointer()),
                     Pointer.to(out.pointer())
             );
-            case "y" -> startGPUTask("mtxOperations.flipY",
-                    in.width(), in.height(), 1,
+            case "rows" -> startGPUTask("mtxOperations.swapRows",
+                    in.width(), 1, 1,
                     Pointer.to(new int[] { in.width() }),
-                    Pointer.to(new int[] { in.height() }),
+                    Pointer.to(new int[] { Integer.parseInt(args[2]) }),
+                    Pointer.to(new int[] { Integer.parseInt(args[3]) }),
                     Pointer.to(in.pointer()),
                     Pointer.to(out.pointer())
             );
@@ -40,11 +47,18 @@ public class Flip extends Instruction {
 
     @Override
     public void addOutputVariable(String... args) {
-        if (args.length < 3)
+        if (args.length < 5)
             throw new IllegalStateException("Instruction format error!");
 
-        if (!args[2].equals("x") && !args[2].equals("y"))
+        if (!args[4].equals("columns") && !args[4].equals("rows"))
             throw new IllegalStateException("Wrong border type!");
+
+        try {
+            Integer.parseInt(args[2]);
+            Integer.parseInt(args[3]);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Instruction format error!");
+        }
 
         Matrix var = getVariable(args[1]);
         if (var == null)
@@ -64,6 +78,6 @@ public class Flip extends Instruction {
     @Override
     public String documentation() {
         return """
-                flip <out> <in> <direction>""";
+                flip <out> <in> <index 1> <index 2> <direction>""";
     }
 }

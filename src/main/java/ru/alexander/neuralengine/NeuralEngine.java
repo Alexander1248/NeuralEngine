@@ -37,18 +37,21 @@ public class NeuralEngine extends MatrixEngine {
         loadFunction("avgPoolingBackpropagation", "neuralOperations");
 
 
+        addInstruction(new Pooling(this));
+
         addInstruction(new ConvBackprop(this));
         addInstruction(new MatMulBackprop(this));
-        addInstruction(new Pooling(this));
         addInstruction(new PoolingBackprop(this));
+
         addInstruction(new Relu(this));
-        addInstruction(new ReluDer(this));
         addInstruction(new Sigmoid(this));
-        addInstruction(new SigmoidDer(this));
-        addInstruction(new Softmax(this));
-        addInstruction(new SoftmaxDer(this));
         addInstruction(new Tangent(this));
+        addInstruction(new Softmax(this));
+
+        addInstruction(new ReluDer(this));
+        addInstruction(new SigmoidDer(this));
         addInstruction(new TangentDer(this));
+        addInstruction(new SoftmaxDer(this));
     }
 
 

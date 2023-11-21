@@ -32,6 +32,29 @@ __global__ void flipY(int width, int height,
 }
 
 extern "C"
+__global__ void swapColumns(int width, int height, int c0, int c1,
+            float* in, float* out) {
+    int y = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (y < height) {
+        float value = in[c0 + y * width];
+        out[c0 + y * width] = in[c1 + y * width];
+        out[c1 + y * width] = value;
+    }
+}
+extern "C"
+__global__ void swapRows(int width, int r0, int r1,
+            float* in, float* out) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (x < width) {
+        float value = in[x + r0 * width];
+        out[x + r0 * width] = in[x + r1 * width];
+        out[x + r1 * width] = value;
+    }
+}
+
+extern "C"
 __global__ void rotate90(int width, int height,
             float* in, float* out) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;

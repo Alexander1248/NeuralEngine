@@ -993,6 +993,137 @@ public class ExecutionTests {
     }
 
     @Test(timeout = timeout)
+    public void testFlipX() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in = new float[size];
+        float[] out = new float[size];
+        for (int i = 0; i < size; i++) {
+            in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in[(width - 1 - i % width) + (i / width) * width];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+        engine.addVariable("in", width, height, in);
+
+        engine.compile("""
+                flip out in x
+                """);
+
+        t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        NeuralEngine.closeCuda();
+        assertArrayEquals(out, cOut, 0.1f);
+    }
+    @Test(timeout = timeout)
+    public void testFlipY() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in = new float[size];
+        float[] out = new float[size];
+        for (int i = 0; i < size; i++) {
+            in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in[i % width + (height - 1 - i / width) * width];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+        engine.addVariable("in", width, height, in);
+
+        engine.compile("""
+                flip out in y
+                """);
+
+        t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        NeuralEngine.closeCuda();
+        assertArrayEquals(out, cOut, 0.1f);
+    }
+    @Test(timeout = timeout)
+    public void testSwapColumns() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in = new float[size];
+        float[] out = new float[size];
+        for (int i = 0; i < size; i++) {
+            in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        System.arraycopy(in, 0, out, 0, size);
+        for (int i = 0; i < height; i++) {
+            out[3 + i * width] = in[507 + i * width];
+            out[507 + i * width] = in[3 + i * width];
+        }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+        engine.addVariable("in", width, height, in);
+
+        engine.compile("""
+                swap out in 3 507 columns
+                """);
+
+        t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        NeuralEngine.closeCuda();
+        assertArrayEquals(out, cOut, 0.1f);
+    }
+    @Test(timeout = timeout)
+    public void testSwapRows() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine();
+        Random random = new Random();
+
+        float[] in = new float[size];
+        float[] out = new float[size];
+        for (int i = 0; i < size; i++) {
+            in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        System.arraycopy(in, 0, out, 0, size);
+        for (int i = 0; i < height; i++) {
+            out[i + 17 * width] = in[i + 214 * width];
+            out[i + 214 * width] = in[i + 17 * width];
+        }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+        engine.addVariable("in", width, height, in);
+
+        engine.compile("""
+                swap out in 17 214 rows
+                """);
+
+        t = System.nanoTime();
+        engine.compute();
+        System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
+
+        float[] cOut = engine.getVariable("out");
+        engine.close();
+        NeuralEngine.closeCuda();
+        assertArrayEquals(out, cOut, 0.1f);
+    }
+
+    @Test(timeout = timeout)
     public void testScript() throws IOException {
         NeuralEngine.initCuda();
         NeuralEngine engine = new NeuralEngine();

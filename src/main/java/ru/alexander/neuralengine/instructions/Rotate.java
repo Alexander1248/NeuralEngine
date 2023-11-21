@@ -1,9 +1,12 @@
 package ru.alexander.neuralengine.instructions;
 
 import jcuda.Pointer;
+import jcuda.Sizeof;
 import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.executor.Instruction;
 import ru.alexander.neuralengine.executor.Matrix;
+
+import static jcuda.driver.JCudaDriver.cuMemcpyDtoD;
 
 public class Rotate extends Instruction {
     public Rotate(GpuExecutor executor) {
@@ -24,6 +27,7 @@ public class Rotate extends Instruction {
         if (angle < 0) angle += 4;
 
         switch (angle) {
+            case 0 -> cuMemcpyDtoD(out.pointer(), in.pointer(), (long) Sizeof.FLOAT * in.width() * in.height());
             case 1 -> startGPUTask("mtxOperations.rotate90",
                     in.height(), in.width(), 1,
                     Pointer.to(new int[] { in.height() }),
@@ -45,6 +49,7 @@ public class Rotate extends Instruction {
                     Pointer.to(in.pointer()),
                     Pointer.to(out.pointer())
             );
+            default -> throw new IllegalStateException("Unexpected value: " + angle);
         }
     }
 
@@ -57,18 +62,31 @@ public class Rotate extends Instruction {
         if (var == null)
             throw new IllegalStateException("Variable not exists!");
 
+        int angle;
         try {
-            Integer.parseInt(args[2]);
+            angle = Math.round((float) Integer.parseInt(args[2]) / 90) % 4;
+            if (angle < 0) angle += 4;
         } catch (Exception ex) {
             throw new IllegalStateException("Instruction format error!");
         }
-
+        int w, h;
+        switch (angle) {
+            case 0, 2 -> {
+                w = var.width();
+                h = var.height();
+            }
+            case 1, 3 -> {
+                w = var.height();
+                h = var.width();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + angle);
+        }
         if (hasVariable(args[0])
-                && !variableSizeIsEqual(args[0], var.height(), var.width()))
+                && !variableSizeIsEqual(args[0], w, h))
             throw new IllegalStateException("Variable reformat error!");
 
         removeVariable(args[0]);
-        addVariable(args[0], var.height(), var.width());
+        addVariable(args[0], w, h);
     }
     public int[] getOutputVariableArgs() {
         return new int[] { 0 };

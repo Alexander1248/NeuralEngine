@@ -20,6 +20,8 @@ public class MatrixEngine extends GpuExecutor {
         loadFunction("set", "mtxOperations");
         loadFunction("sum", "mtxOperations");
         loadFunction("mul", "mtxOperations");
+        loadFunction("swapRows", "mtxOperations");
+        loadFunction("swapColumns", "mtxOperations");
 
         loadFunction("tensorAdd", "mtxOperations");
         loadFunction("tensorSub", "mtxOperations");
@@ -35,19 +37,25 @@ public class MatrixEngine extends GpuExecutor {
         loadFunction("matrixConvRepeatBorder", "mtxOperations");
 
         addInstruction(new Add(this));
-        addInstruction(new Concatenate(this));
-        addInstruction(new Conv(this));
-        addInstruction(new Div(this));
-        addInstruction(new Linearize(this));
+        addInstruction(new Sub(this));
+
         addInstruction(new MatMul(this));
         addInstruction(new Mul(this));
-        addInstruction(new Sub(this));
-        addInstruction(new Transpose(this));
+        addInstruction(new Conv(this));
+        addInstruction(new Div(this));
+
+        addInstruction(new Concatenate(this));
+
+
         addInstruction(new Set(this));
-        addInstruction(new Transform(this));
-        addInstruction(new Rotate(this));
-        addInstruction(new Flip(this));
         addInstruction(new Sum(this));
+        addInstruction(new Flip(this));
+        addInstruction(new Swap(this));
+        addInstruction(new Rotate(this));
+        addInstruction(new Transpose(this));
+
+        addInstruction(new Linearize(this));
+        addInstruction(new Transform(this));
     }
 
 
