@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class MatrixEngine extends GpuExecutor {
 
-    //    nvcc -arch=all-major -fatbin matrices.cu -o src/main/resources/kernels/matrices.fatbin
     public MatrixEngine() throws IOException {
         super();
         loadModuleFromResources("mtxOperations", "kernels/matrices.fatbin");

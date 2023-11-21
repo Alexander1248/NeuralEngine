@@ -1,4 +1,3 @@
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -41,11 +40,15 @@ public class ExecutionTests {
         float[] in1 = new float[size];
         float[] in2 = new float[size];
         float[] out = new float[size];
+
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
-            out[i] = in1[i] + in2[i];
         }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in1[i] + in2[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", width, height, in2);
@@ -54,7 +57,7 @@ public class ExecutionTests {
                 add out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -75,8 +78,11 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
-            out[i] = in1[i] - in2[i];
         }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in1[i] - in2[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", width, height, in2);
@@ -85,7 +91,7 @@ public class ExecutionTests {
                 sub out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -106,8 +112,11 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
-            out[i] = in1[i] * in2[i];
         }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in1[i] * in2[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", width, height, in2);
@@ -116,7 +125,7 @@ public class ExecutionTests {
                 mul out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -137,8 +146,11 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
-            out[i] = in1[i] / in2[i];
         }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[i] = in1[i] / in2[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", width, height, in2);
@@ -147,7 +159,7 @@ public class ExecutionTests {
                 div out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -164,18 +176,20 @@ public class ExecutionTests {
 
         float[] in = new float[size];
         float[] out = new float[size];
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
             in[i] = random.nextFloat() * 2 - 1;
-            out[(i / width) + height * (i % width)] = in[i];
-        }
 
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[(i / width) + height * (i % width)] = in[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
         engine.addVariable("in", width, height, in);
 
         engine.compile("""
                 transpose out in
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -194,8 +208,10 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
-            out[i] = in[i];
         }
+        long t = System.nanoTime();
+        System.arraycopy(in, 0, out, 0, size);
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -203,7 +219,7 @@ public class ExecutionTests {
                 linearize out in
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -223,13 +239,13 @@ public class ExecutionTests {
 
         float[] in1 = new float[size];
         float[] in2 = new float[size];
-
         float[] out = new float[width * width];
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
         }
 
+        long t = System.nanoTime();
         for (int i = 0; i < width * width; i++) {
             int x = i % width;
             int y = i / width;
@@ -238,6 +254,7 @@ public class ExecutionTests {
             for (int j = 0; j < height; j++)
                 out[i] += in1[j + y * height] * in2[x + j * width];
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", height, width, in1);
         engine.addVariable("in2", width, height, in2);
@@ -246,7 +263,7 @@ public class ExecutionTests {
                 matmul out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -264,13 +281,13 @@ public class ExecutionTests {
 
         float[] in1 = new float[size];
         float[] in2 = new float[size];
-
         float[] out = new float[height * height];
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
         }
 
+        long t = System.nanoTime();
         for (int i = 0; i < height * height; i++) {
             int x = i % height;
             int y = i / height;
@@ -279,6 +296,7 @@ public class ExecutionTests {
             for (int j = 0; j < width; j++)
                 out[i] += in1[j + y * width] * in2[x + j * height];
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", height, width, in2);
@@ -287,7 +305,7 @@ public class ExecutionTests {
                 matmul out in1 in2
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -311,6 +329,12 @@ public class ExecutionTests {
             if (in[i] >= 0) out[i] = in[i] * 0.7f;
             else out[i] = in[i] * 0.03f;
         }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
+            if (in[i] >= 0) out[i] = in[i] * 0.7f;
+            else out[i] = in[i] * 0.03f;
+        }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -318,7 +342,7 @@ public class ExecutionTests {
                 relu out in 0.7 0.03
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -337,9 +361,13 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             if (in[i] >= 0) out[i] = 0.7f;
             else out[i] = 0.03f;
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -347,7 +375,7 @@ public class ExecutionTests {
                 relu_der out in 0.7 0.03
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -367,8 +395,12 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             out[i] = (float) (1.0 / (1 + Math.exp(-0.8 * in[i])));
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -376,7 +408,7 @@ public class ExecutionTests {
                 sigmoid out in 0.8
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -395,9 +427,14 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             double exp = Math.exp(-0.8 * in[i]);
             out[i] = (float) (0.8 * exp / Math.pow(1 + exp, 2));
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -405,7 +442,7 @@ public class ExecutionTests {
                 sigmoid_der out in 0.8
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -425,8 +462,13 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             out[i] = (float) (2.0 / (1 + Math.exp(-0.4 * in[i])) - 1);
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -434,7 +476,7 @@ public class ExecutionTests {
                 tangent out in 0.4
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -453,9 +495,14 @@ public class ExecutionTests {
         float[] out = new float[size];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             double exp = Math.exp(-0.8 * in[i]);
             out[i] = (float) (1.6 * exp / Math.pow(1 + exp, 2));
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -463,7 +510,7 @@ public class ExecutionTests {
                 tangent_der out in 0.8
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -484,11 +531,16 @@ public class ExecutionTests {
         float[] sum = new float[height];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             out[i] = (float) Math.exp(0.6 * in[i]);
             sum[i / width] += out[i];
         }
         for (int i = 0; i < size; i++)
             out[i] /= sum[i / width];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -496,7 +548,7 @@ public class ExecutionTests {
                 softmax out in 0.6
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -516,6 +568,10 @@ public class ExecutionTests {
         float[] sum = new float[height];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
+        }
+
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
             out[i] = (float) Math.exp(0.6 * in[i]);
             sum[i / width] += out[i];
         }
@@ -523,14 +579,14 @@ public class ExecutionTests {
             int y = i / width;
             out[i] = (sum[y] - out[i]) * 0.6f * out[i] / (sum[y] * sum[y]);
         }
-
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
         engine.addVariable("in", width, height, in);
 
         engine.compile("""
                 softmax_der out in 0.6
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -556,6 +612,8 @@ public class ExecutionTests {
         for (int i = 0; i < 9; i++)
             mtx[i] = random.nextFloat() * 2 - 1;
 
+
+        long t = System.nanoTime();
         for (int i = 0; i < size; i++) {
             int x = i % width;
             int y = i / width;
@@ -575,6 +633,7 @@ public class ExecutionTests {
                 }
             }
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
         engine.addVariable("mtx", 3, 3, mtx);
@@ -583,7 +642,7 @@ public class ExecutionTests {
                 conv out in mtx empty
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -607,6 +666,7 @@ public class ExecutionTests {
         for (int i = 0; i < 9; i++)
             mtx[i] = random.nextFloat() * 2 - 1;
 
+        long t = System.nanoTime();
         for (int i = 0; i < size; i++) {
             int x = i % width;
             int y = i / width;
@@ -622,6 +682,7 @@ public class ExecutionTests {
                 }
             }
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
         engine.addVariable("mtx", 3, 3, mtx);
@@ -630,7 +691,7 @@ public class ExecutionTests {
                 conv out in mtx extend
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -654,6 +715,7 @@ public class ExecutionTests {
         for (int i = 0; i < 9; i++)
             mtx[i] = random.nextFloat() * 2 - 1;
 
+        long t = System.nanoTime();
         for (int i = 0; i < size; i++) {
             int x = i % width;
             int y = i / width;
@@ -673,6 +735,7 @@ public class ExecutionTests {
                 }
             }
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
         engine.addVariable("mtx", 3, 3, mtx);
@@ -681,7 +744,7 @@ public class ExecutionTests {
                 conv out in mtx repeat
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -705,8 +768,11 @@ public class ExecutionTests {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
         }
+
+        long t = System.nanoTime();
         System.arraycopy(in1, 0, out, 0, size);
         System.arraycopy(in2, 0, out, size, size);
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
 
         engine.addVariable("in1", width, height, in1);
@@ -716,7 +782,7 @@ public class ExecutionTests {
                 concatenate out in1 in2 vertical
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -742,6 +808,7 @@ public class ExecutionTests {
             in2[i] = random.nextFloat() * 2 - 1;
         }
 
+        long t = System.nanoTime();
         for (int i = 0; i < size2; i++) {
             int x = i % w2;
             int y = i / w2;
@@ -752,6 +819,7 @@ public class ExecutionTests {
                 out[i] = in2[x + y * width];
             }
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
 
         engine.addVariable("in1", width, height, in1);
@@ -761,7 +829,7 @@ public class ExecutionTests {
                 concatenate out in1 in2 horizontal
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -783,6 +851,7 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++)
             in[i] = random.nextFloat() * 2 - 1;
 
+        long t = System.nanoTime();
         int hW = width / 2;
         for (int i = 0; i < qSize; i++) {
             out[i] = 1e38f;
@@ -793,6 +862,7 @@ public class ExecutionTests {
                     out[i] = Math.min(out[i], in[(x + dx) + (y + dy) * width]);
 
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -800,7 +870,7 @@ public class ExecutionTests {
                 pooling out in 2 min
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -821,6 +891,7 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++)
             in[i] = random.nextFloat() * 2 - 1;
 
+        long t = System.nanoTime();
         int hW = width / 2;
         for (int i = 0; i < qSize; i++) {
             out[i] = -1e38f;
@@ -831,6 +902,7 @@ public class ExecutionTests {
                     out[i] = Math.max(out[i], in[(x + dx) + (y + dy) * width]);
 
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -838,7 +910,7 @@ public class ExecutionTests {
                 pooling out in 2 max
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -859,6 +931,7 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++)
             in[i] = random.nextFloat() * 2 - 1;
 
+        long t = System.nanoTime();
         int hW = width / 2;
         for (int i = 0; i < qSize; i++) {
             out[i] = 0;
@@ -869,6 +942,7 @@ public class ExecutionTests {
                     out[i] += in[(x + dx) + (y + dy) * width];
             out[i] /= 4;
         }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in", width, height, in);
 
@@ -876,7 +950,7 @@ public class ExecutionTests {
                 pooling out in 2 avg
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -893,20 +967,22 @@ public class ExecutionTests {
         Random random = new Random();
 
         float[] in = new float[size];
-
         float[] out = new float[1];
         for (int i = 0; i < size; i++) {
             in[i] = random.nextFloat() * 2 - 1;
-            out[0] += in[i];
         }
 
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++)
+            out[0] += in[i];
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
         engine.addVariable("in", width, height, in);
 
         engine.compile("""
                 sum out in
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
@@ -929,10 +1005,14 @@ public class ExecutionTests {
         for (int i = 0; i < size; i++) {
             in1[i] = random.nextFloat() * 2 - 1;
             in2[i] = random.nextFloat() * 2 - 1;
-            out[i] = (in1[i] + in2[i]) * (in1[i] - in2[i]);
         }
 
-
+        long t = System.nanoTime();
+        for (int i = 0; i < size; i++) {
+            out[i] = (in1[i] + in2[i]) * (in1[i] - in2[i]);
+            out[i] = (float) (1.0 / (1 + Math.exp(-0.637 * out[i])));
+        }
+        System.out.printf("CPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 
         engine.addVariable("in1", width, height, in1);
         engine.addVariable("in2", width, height, in2);
@@ -941,9 +1021,10 @@ public class ExecutionTests {
                 add sum in1 in2
                 sub delta in1 in2
                 mul out sum delta
+                sigmoid out out 0.637
                 """);
 
-        long t = System.nanoTime();
+        t = System.nanoTime();
         engine.compute();
         System.out.printf("GPU Execution time: %1.7f \n", (double) (System.nanoTime() - t) * tScale);
 

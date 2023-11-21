@@ -6,7 +6,6 @@ import java.io.IOException;
 
 public class NeuralEngine extends MatrixEngine {
 
-    //    nvcc -arch=all-major -fatbin neural.cu -o src/main/resources/kernels/neural.fatbin
     public NeuralEngine() throws IOException {
         super();
         loadModuleFromResources("neuralOperations", "kernels/neural.fatbin");
