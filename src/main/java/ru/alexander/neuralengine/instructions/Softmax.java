@@ -20,7 +20,7 @@ public class Softmax extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.softmax",
+        startGPUTask("neuralOperations.softmax",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),

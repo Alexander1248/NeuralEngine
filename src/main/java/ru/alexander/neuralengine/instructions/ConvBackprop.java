@@ -26,7 +26,7 @@ public class ConvBackprop extends Instruction {
 
         switch (args[3]) {
             case "empty" -> {
-                startGPUTask("mtxOperations.matrixConvEmptyBorderBackpropagationErrorTraversal",
+                startGPUTask("neuralOperations.matrixConvEmptyBorderBackpropagationErrorTraversal",
                         in.width(), in.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
@@ -36,7 +36,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(mtx.pointer()),
                         Pointer.to(prevError.pointer())
                 );
-                startGPUTask("mtxOperations.matrixConvEmptyBorderBackpropagationWeightCorrection",
+                startGPUTask("neuralOperations.matrixConvEmptyBorderBackpropagationWeightCorrection",
                         mtx.width(), mtx.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
@@ -49,7 +49,7 @@ public class ConvBackprop extends Instruction {
                 );
             }
             case "extend" -> {
-                startGPUTask("mtxOperations.matrixConvExtendBorderBackpropagationErrorTraversal",
+                startGPUTask("neuralOperations.matrixConvExtendBorderBackpropagationErrorTraversal",
                         in.width(), in.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
@@ -59,7 +59,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(mtx.pointer()),
                         Pointer.to(prevError.pointer())
                 );
-                startGPUTask("mtxOperations.matrixConvExtendBorderBackpropagationWeightCorrection",
+                startGPUTask("neuralOperations.matrixConvExtendBorderBackpropagationWeightCorrection",
                         mtx.width(), mtx.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
@@ -72,7 +72,7 @@ public class ConvBackprop extends Instruction {
                 );
             }
             case "repeat" -> {
-                startGPUTask("mtxOperations.matrixConvRepeatBorderBackpropagationErrorTraversal",
+                startGPUTask("neuralOperations.matrixConvRepeatBorderBackpropagationErrorTraversal",
                         in.width(), in.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),
@@ -82,7 +82,7 @@ public class ConvBackprop extends Instruction {
                         Pointer.to(mtx.pointer()),
                         Pointer.to(prevError.pointer())
                 );
-                startGPUTask("mtxOperations.matrixConvRepeatBorderBackpropagationWeightCorrection",
+                startGPUTask("neuralOperations.matrixConvRepeatBorderBackpropagationWeightCorrection",
                         in.width(), in.height(), 1,
                         Pointer.to(new int[]{in.width()}),
                         Pointer.to(new int[]{in.height()}),

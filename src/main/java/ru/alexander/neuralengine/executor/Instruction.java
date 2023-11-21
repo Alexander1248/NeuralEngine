@@ -47,7 +47,7 @@ public abstract class Instruction {
             int sx, int sy, int sz,
             Pointer... params) {
         CUfunction func = executor.getFunctions().get(function);
-        if (func == null) throw new IllegalStateException("Function not exists!");
+        if (func == null) throw new IllegalStateException("Instruction " + getInstructionName() + " not exists!");
 
         int mod = sx / (int) Math.ceil((double) sx / 1023) + 1;
         int lx = Math.min(sx, mod);

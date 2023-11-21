@@ -23,7 +23,7 @@ public class MatMulBackprop extends Instruction {
         Matrix currError = getVariable(args[3]);
         Matrix weights = getVariable(args[4]);
 
-        startGPUTask("mtxOperations.matrixMulBackpropagationErrorTraversal",
+        startGPUTask("neuralOperations.matrixMulBackpropagationErrorTraversal",
                 weights.height(), currError.width(), 1,
                 Pointer.to(new int[]{currError.height()}),
                 Pointer.to(new int[]{currError.width()}),
@@ -32,7 +32,7 @@ public class MatMulBackprop extends Instruction {
                 Pointer.to(weights.pointer()),
                 Pointer.to(prevError.pointer())
         );
-        startGPUTask("mtxOperations.matrixMulBackpropagationWeightCorrection",
+        startGPUTask("neuralOperations.matrixMulBackpropagationWeightCorrection",
                 currError.width(), in.width(), 1,
                 Pointer.to(new int[]{in.height()}),
                 Pointer.to(new int[]{in.width()}),

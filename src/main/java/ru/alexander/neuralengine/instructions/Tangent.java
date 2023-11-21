@@ -20,7 +20,7 @@ public class Tangent extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.tangent",
+        startGPUTask("neuralOperations.tangent",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),

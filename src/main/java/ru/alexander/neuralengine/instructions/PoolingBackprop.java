@@ -23,7 +23,7 @@ public class PoolingBackprop extends Instruction {
         Matrix out = getVariable(args[3]);
 
         switch (args[5]) {
-            case "max", "min" -> startGPUTask("mtxOperations.maxminPoolingBackpropagation",
+            case "max", "min" -> startGPUTask("neuralOperations.maxminPoolingBackpropagation",
                     out.width(), out.height(), 1,
                     Pointer.to(new int[] { out.width() }),
                     Pointer.to(new int[] { out.height() }),
@@ -33,7 +33,7 @@ public class PoolingBackprop extends Instruction {
                     Pointer.to(currError.pointer()),
                     Pointer.to(prevError.pointer())
             );
-            case "avg" -> startGPUTask("mtxOperations.avgPoolingBackpropagation",
+            case "avg" -> startGPUTask("neuralOperations.avgPoolingBackpropagation",
                     out.width(), out.height(), 1,
                     Pointer.to(new int[] { out.width() }),
                     Pointer.to(new int[] { out.height() }),

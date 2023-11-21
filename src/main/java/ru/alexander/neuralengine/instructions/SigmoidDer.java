@@ -20,7 +20,7 @@ public class SigmoidDer extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("mtxOperations.sigmoidDer",
+        startGPUTask("neuralOperations.sigmoidDer",
                 in.width(), in.height(), 1,
                 Pointer.to(new int[] { in.width() }),
                 Pointer.to(new int[] { in.height() }),

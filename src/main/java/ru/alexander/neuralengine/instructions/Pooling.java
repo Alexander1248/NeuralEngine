@@ -21,7 +21,7 @@ public class Pooling extends Instruction {
         Matrix in = getVariable(args[1]);
 
         switch (args[3]) {
-            case "max" -> startGPUTask("mtxOperations.maxPooling",
+            case "max" -> startGPUTask("neuralOperations.maxPooling",
                     out.width(), out.height(), 1,
                     Pointer.to(new int[] { out.width() }),
                     Pointer.to(new int[] { out.height() }),
@@ -29,7 +29,7 @@ public class Pooling extends Instruction {
                     Pointer.to(in.pointer()),
                     Pointer.to(out.pointer())
             );
-            case "min" -> startGPUTask("mtxOperations.minPooling",
+            case "min" -> startGPUTask("neuralOperations.minPooling",
                     out.width(), out.height(), 1,
                     Pointer.to(new int[] { out.width() }),
                     Pointer.to(new int[] { out.height() }),
@@ -37,7 +37,7 @@ public class Pooling extends Instruction {
                     Pointer.to(in.pointer()),
                     Pointer.to(out.pointer())
             );
-            case "avg" -> startGPUTask("mtxOperations.avgPooling",
+            case "avg" -> startGPUTask("neuralOperations.avgPooling",
                     out.width(), out.height(), 1,
                     Pointer.to(new int[] { out.width() }),
                     Pointer.to(new int[] { out.height() }),
