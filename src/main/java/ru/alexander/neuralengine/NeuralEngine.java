@@ -5,71 +5,42 @@ import ru.alexander.neuralengine.instructions.*;
 
 import java.io.IOException;
 
-public class NeuralEngine extends GpuExecutor {
+public class NeuralEngine extends MatrixEngine {
 
-    //    nvcc -arch=all-major -fatbin matrices.cu -o matrices.fatbin
+    //    nvcc -arch=all-major -fatbin neural.cu -o src/main/resources/kernels/neural.fatbin
     public NeuralEngine() throws IOException {
         super();
-        loadModuleFromResources("mtxOperations", "kernels/matrices.fatbin");
-        loadFunction("relu", "mtxOperations");
-        loadFunction("sigmoid", "mtxOperations");
-        loadFunction("tangent", "mtxOperations");
-        loadFunction("softmax", "mtxOperations");
+        loadModuleFromResources("neuralOperations", "kernels/neural.fatbin");
+        loadFunction("relu", "neuralOperations");
+        loadFunction("sigmoid", "neuralOperations");
+        loadFunction("tangent", "neuralOperations");
+        loadFunction("softmax", "neuralOperations");
 
-        loadFunction("reluDer", "mtxOperations");
-        loadFunction("sigmoidDer", "mtxOperations");
-        loadFunction("tangentDer", "mtxOperations");
-        loadFunction("softmaxDer", "mtxOperations");
+        loadFunction("reluDer", "neuralOperations");
+        loadFunction("sigmoidDer", "neuralOperations");
+        loadFunction("tangentDer", "neuralOperations");
+        loadFunction("softmaxDer", "neuralOperations");
 
-        loadFunction("transpose", "mtxOperations");
-        loadFunction("flipX", "mtxOperations");
-        loadFunction("flipY", "mtxOperations");
-        loadFunction("rotate90", "mtxOperations");
-        loadFunction("rotate180", "mtxOperations");
-        loadFunction("rotate270", "mtxOperations");
-        loadFunction("set", "mtxOperations");
-        loadFunction("sum", "mtxOperations");
-        loadFunction("mul", "mtxOperations");
+        loadFunction("matrixMulBackpropagationErrorTraversal", "neuralOperations");
+        loadFunction("matrixMulBackpropagationWeightCorrection", "neuralOperations");
 
-        loadFunction("tensorAdd", "mtxOperations");
-        loadFunction("tensorSub", "mtxOperations");
-        loadFunction("tensorMul", "mtxOperations");
-        loadFunction("tensorDiv", "mtxOperations");
-        loadFunction("matrixMul", "mtxOperations");
+        loadFunction("matrixConvEmptyBorderBackpropagationErrorTraversal", "neuralOperations");
+        loadFunction("matrixConvExtendBorderBackpropagationErrorTraversal", "neuralOperations");
+        loadFunction("matrixConvRepeatBorderBackpropagationErrorTraversal", "neuralOperations");
 
-        loadFunction("matrixMulBackpropagationErrorTraversal", "mtxOperations");
-        loadFunction("matrixMulBackpropagationWeightCorrection", "mtxOperations");
+        loadFunction("matrixConvEmptyBorderBackpropagationWeightCorrection", "neuralOperations");
+        loadFunction("matrixConvExtendBorderBackpropagationWeightCorrection", "neuralOperations");
+        loadFunction("matrixConvRepeatBorderBackpropagationWeightCorrection", "neuralOperations");
 
-        loadFunction("concatenateVertical", "mtxOperations");
-        loadFunction("concatenateHorizontal", "mtxOperations");
+        loadFunction("maxPooling", "neuralOperations");
+        loadFunction("minPooling", "neuralOperations");
+        loadFunction("avgPooling", "neuralOperations");
+        loadFunction("maxminPoolingBackpropagation", "neuralOperations");
+        loadFunction("avgPoolingBackpropagation", "neuralOperations");
 
-        loadFunction("matrixConvEmptyBorder", "mtxOperations");
-        loadFunction("matrixConvExtendBorder", "mtxOperations");
-        loadFunction("matrixConvRepeatBorder", "mtxOperations");
 
-        loadFunction("matrixConvEmptyBorderBackpropagationErrorTraversal", "mtxOperations");
-        loadFunction("matrixConvExtendBorderBackpropagationErrorTraversal", "mtxOperations");
-        loadFunction("matrixConvRepeatBorderBackpropagationErrorTraversal", "mtxOperations");
-
-        loadFunction("matrixConvEmptyBorderBackpropagationWeightCorrection", "mtxOperations");
-        loadFunction("matrixConvExtendBorderBackpropagationWeightCorrection", "mtxOperations");
-        loadFunction("matrixConvRepeatBorderBackpropagationWeightCorrection", "mtxOperations");
-
-        loadFunction("maxPooling", "mtxOperations");
-        loadFunction("minPooling", "mtxOperations");
-        loadFunction("avgPooling", "mtxOperations");
-        loadFunction("maxminPoolingBackpropagation", "mtxOperations");
-        loadFunction("avgPoolingBackpropagation", "mtxOperations");
-
-        addInstruction(new Add(this));
-        addInstruction(new Concatenate(this));
-        addInstruction(new Conv(this));
         addInstruction(new ConvBackprop(this));
-        addInstruction(new Div(this));
-        addInstruction(new Linearize(this));
-        addInstruction(new MatMul(this));
         addInstruction(new MatMulBackprop(this));
-        addInstruction(new Mul(this));
         addInstruction(new Pooling(this));
         addInstruction(new PoolingBackprop(this));
         addInstruction(new Relu(this));
@@ -78,15 +49,8 @@ public class NeuralEngine extends GpuExecutor {
         addInstruction(new SigmoidDer(this));
         addInstruction(new Softmax(this));
         addInstruction(new SoftmaxDer(this));
-        addInstruction(new Sub(this));
         addInstruction(new Tangent(this));
         addInstruction(new TangentDer(this));
-        addInstruction(new Transpose(this));
-        addInstruction(new Set(this));
-        addInstruction(new Transform(this));
-        addInstruction(new Rotate(this));
-        addInstruction(new Flip(this));
-        addInstruction(new Sum(this));
     }
 
 
