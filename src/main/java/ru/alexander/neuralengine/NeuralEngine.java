@@ -1,6 +1,5 @@
 package ru.alexander.neuralengine;
 
-import ru.alexander.neuralengine.executor.GpuExecutor;
 import ru.alexander.neuralengine.instructions.*;
 
 import java.io.IOException;
