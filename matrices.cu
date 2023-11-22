@@ -31,6 +31,51 @@ __global__ void flipY(int width, int height,
     }
 }
 
+
+extern "C"
+__global__ void sortX(int width, int height, int iteration, int step,
+            float* arr) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < (width >> 1) && y < height) {
+        int blockSize = 1 << (iteration - step);
+        int half = blockSize >> 1;
+        int l = x % half;
+        int g = x / half;    
+        int pos1 = y * width + g * blockSize + l;
+        int pos2;
+        if (step == 0) pos2 = y * width + (g + 1) * blockSize - l - 1;
+        else pos2 = y * width + g * blockSize + half + l;
+
+        float buff = arr[pos1];
+        arr[pos1] = arr[pos2];
+        arr[pos2] = buff;
+    }
+}
+extern "C"
+__global__ void sortY(int width, int height, int iteration, int step,
+            float* arr) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < (width >> 1) && y < height) {
+       int blockSize = 1 << (iteration - step);
+        int half = blockSize >> 1;
+        int l = y % half;
+        int g = y / half;    
+        int pos1 = x + (l + g * blockSize) * width;
+        int pos2;
+        if (step == 0) pos2 = x + ((g + 1) * blockSize - l - 1) * width;
+        else pos2 = x + (g * blockSize + half + l) * width;
+
+        float buff = arr[pos1];
+        arr[pos1] = arr[pos2];
+        arr[pos2] = buff;
+    }
+}
+
+
 extern "C"
 __global__ void swapColumns(int width, int height, int c0, int c1,
             float* in, float* out) {
@@ -295,3 +340,4 @@ __global__ void matrixConvRepeatBorder(int width, int height, int mx, int my,
         out[x + y * width] = sum;
     }
 }
+

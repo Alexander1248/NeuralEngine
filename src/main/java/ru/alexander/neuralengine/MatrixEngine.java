@@ -14,6 +14,8 @@ public class MatrixEngine extends GpuExecutor {
         loadFunction("transpose", "mtxOperations");
         loadFunction("flipX", "mtxOperations");
         loadFunction("flipY", "mtxOperations");
+        loadFunction("sortX", "mtxOperations");
+        loadFunction("sortY", "mtxOperations");
         loadFunction("rotate90", "mtxOperations");
         loadFunction("rotate180", "mtxOperations");
         loadFunction("rotate270", "mtxOperations");
@@ -49,6 +51,7 @@ public class MatrixEngine extends GpuExecutor {
 
         addInstruction(new Set(this));
         addInstruction(new Sum(this));
+        addInstruction(new Sort(this));
         addInstruction(new Flip(this));
         addInstruction(new Swap(this));
         addInstruction(new Rotate(this));
@@ -57,6 +60,4 @@ public class MatrixEngine extends GpuExecutor {
         addInstruction(new Linearize(this));
         addInstruction(new Transform(this));
     }
-
-
 }
