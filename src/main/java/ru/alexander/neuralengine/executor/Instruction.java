@@ -33,8 +33,14 @@ public abstract class Instruction {
     protected Matrix getVariable(String name) {
         return executor.getVariableData(name);
     }
-    protected float[] getVariableMtx(String name) {
-        return executor.getVariable(name);
+    protected float[] getVariableMtxFloat(String name) {
+        return executor.getVariableFloat(name);
+    }
+    protected double[] getVariableMtxDouble(String name) {
+        return executor.getVariableDouble(name);
+    }
+    public boolean isDoublePrecision() {
+        return executor.isDoublePrecision();
     }
     protected void loadDataInVariable(String name, float[] data) {
         executor.loadDataInVariable(name, data);

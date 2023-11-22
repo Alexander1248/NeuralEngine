@@ -7,9 +7,12 @@ import java.io.IOException;
 
 public class MatrixEngine extends GpuExecutor {
 
-    public MatrixEngine() throws IOException {
-        super();
-        loadModuleFromResources("mtxOperations", "kernels/matrices.fatbin");
+    public MatrixEngine(boolean doublePrecision) throws IOException {
+        super(doublePrecision);
+        if (doublePrecision)
+            loadModuleFromResources("mtxOperations", "kernels/matricesDouble.fatbin");
+        else
+            loadModuleFromResources("mtxOperations", "kernels/matricesFloat.fatbin");
 
         loadFunction("transpose", "mtxOperations");
         loadFunction("flipX", "mtxOperations");

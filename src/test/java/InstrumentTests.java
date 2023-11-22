@@ -20,9 +20,9 @@ import static org.junit.Assert.*;
 
 public class InstrumentTests {
     @Test
-    public void testNEPSaveLoad() throws IOException {
+    public void testFloatNEPSaveLoad() throws IOException {
         NeuralEngine.initCuda();
-        NeuralEngine engine = new NeuralEngine();
+        NeuralEngine engine = new NeuralEngine(false);
 
         engine.addVariable("in1", 100, 50);
         engine.addVariable("in2", 100, 50);
@@ -36,7 +36,29 @@ public class InstrumentTests {
                 """);
         engine.saveProject("test.nep", new NeuralEngineProject());
 
-        NeuralEngine load = new NeuralEngine();
+        NeuralEngine load = new NeuralEngine(false);
+        load.loadProject("test.nep", new NeuralEngineProject());
+
+        assertEquals(engine, load);
+    }
+    @Test
+    public void testDoubleNEPSaveLoad() throws IOException {
+        NeuralEngine.initCuda();
+        NeuralEngine engine = new NeuralEngine(true);
+
+        engine.addVariable("in1", 100, 50);
+        engine.addVariable("in2", 100, 50);
+
+        engine.compile("""
+                add out in1 in2
+                mul out out in1
+                transpose tin2 in2
+                matmul out1 out tin2
+                matmul out2 out1 out
+                """);
+        engine.saveProject("test.nep", new NeuralEngineProject());
+
+        NeuralEngine load = new NeuralEngine(true);
         load.loadProject("test.nep", new NeuralEngineProject());
 
         assertEquals(engine, load);
@@ -45,7 +67,7 @@ public class InstrumentTests {
     @Test
     public void testNESSaveLoad() throws IOException {
         NeuralEngine.initCuda();
-        NeuralEngine engine = new NeuralEngine();
+        NeuralEngine engine = new NeuralEngine(false);
 
         engine.addVariable("in1", 100, 50);
         engine.addVariable("in2", 100, 50);
@@ -59,17 +81,18 @@ public class InstrumentTests {
                 """);
         engine.saveProject("test.nes", new NeuralEngineScheme());
 
-        NeuralEngine load = new NeuralEngine();
+        NeuralEngine load = new NeuralEngine(false);
         load.loadProject("test.nes", new NeuralEngineScheme());
 
         assertEquals(engine, load);
     }
 
+    @SuppressWarnings("removal")
     @Ignore
     @Test
     public void testScripts() throws IOException {
         NeuralEngine.initCuda();
-        NeuralEngine engine = new NeuralEngine();
+        NeuralEngine engine = new NeuralEngine(false);
 
         engine.addVariable("in1", 100, 50);
         engine.addVariable("in2", 100, 50);
@@ -102,7 +125,7 @@ public class InstrumentTests {
     @Test
     public void testVisualization() throws IOException {
         NeuralEngine.initCuda();
-        NeuralEngine engine = new NeuralEngine();
+        NeuralEngine engine = new NeuralEngine(false);
         System.out.println(engine.getDocumentation());
 
         engine.addVariable("in1", 100, 50);

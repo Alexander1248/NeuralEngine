@@ -57,8 +57,9 @@ public class NeuralEngineProject implements ProjectIOFormat {
                     throw new IllegalStateException("File is too new for this version!");
             }
         }
-
-
+        boolean doublePrecision = buffer.get() == 1;
+        if (doublePrecision != executor.isDoublePrecision())
+            throw new IllegalStateException("Project in another precision!");
 
         int instructionCount = buffer.getInt();
         for (int i = 0; i < instructionCount; i++) {
@@ -78,11 +79,21 @@ public class NeuralEngineProject implements ProjectIOFormat {
             buffer.get(buff, 0, nameLen);
             int width = buffer.getInt();
             int height = buffer.getInt();
-            float[] mtxData = new float[width * height];
-            for (int j = 0; j < mtxData.length; j++)
-                mtxData[j] = buffer.getFloat();
+            if (doublePrecision) {
+                double[] mtxData = new double[width * height];
+                for (int j = 0; j < mtxData.length; j++)
+                    mtxData[j] = buffer.getDouble();
 
-            executor.addVariable(new String(buff), width, height, mtxData);
+                executor.addVariable(new String(buff), width, height, mtxData);
+            }
+            else {
+                float[] mtxData = new float[width * height];
+                for (int j = 0; j < mtxData.length; j++)
+                    mtxData[j] = buffer.getFloat();
+
+                executor.addVariable(new String(buff), width, height, mtxData);
+            }
+
         }
 
 
@@ -94,9 +105,14 @@ public class NeuralEngineProject implements ProjectIOFormat {
 
     @Override
     public void save(FileOutputStream stream, Data data, GpuExecutor executor) throws IOException {
-        AtomicInteger size = new AtomicInteger(62 + data.code.length());
+        AtomicInteger size = new AtomicInteger(63 + data.code.length());
         data.instructions.forEach((name, instruction) -> size.addAndGet(4 + name.length()));
-        data.vars.forEach((name, mtx) -> size.addAndGet(12 + name.length() + mtx.width() * mtx.height() * 4));
+
+        if (executor.isDoublePrecision())
+            data.vars.forEach((name, mtx) -> size.addAndGet(12 + name.length() + mtx.width() * mtx.height() * 8));
+        else
+            data.vars.forEach((name, mtx) -> size.addAndGet(12 + name.length() + mtx.width() * mtx.height() * 8));
+
 
         ByteBuffer buffer = ByteBuffer.allocate(size.get());
 
@@ -112,8 +128,7 @@ public class NeuralEngineProject implements ProjectIOFormat {
         else buffer.put("unknown ".getBytes());
 
         buffer.position(50);
-
-
+        buffer.put((byte) (executor.isDoublePrecision() ? 1 : 0));
 
         buffer.putInt(data.instructions.size());
         data.instructions.forEach((name, instruction) -> {
@@ -128,9 +143,16 @@ public class NeuralEngineProject implements ProjectIOFormat {
             buffer.putInt(mtx.width());
             buffer.putInt(mtx.height());
 
-            float[] mtxData = executor.getVariable(name);
-            for (int i = 0; i < mtxData.length; i++)
-                buffer.putFloat(mtxData[i]);
+            if (executor.isDoublePrecision()) {
+                double[] mtxData = executor.getVariableDouble(name);
+                for (int i = 0; i < mtxData.length; i++)
+                    buffer.putDouble(mtxData[i]);
+            }
+            else {
+                float[] mtxData = executor.getVariableFloat(name);
+                for (int i = 0; i < mtxData.length; i++)
+                    buffer.putFloat(mtxData[i]);
+            }
         });
 
 

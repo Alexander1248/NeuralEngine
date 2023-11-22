@@ -23,16 +23,19 @@ public class Set extends Instruction {
         try {
             value = Float.parseFloat(args[3]);
         } catch (Exception ex) {
-            value = getVariableMtx(args[3])[0];
+            if (isDoublePrecision())
+                value = (float) getVariableMtxDouble(args[3])[0];
+            else
+                value = getVariableMtxFloat(args[3])[0];
         }
 
         startGPUTask("mtxOperations.set",
                 out.width(), out.height(), 1,
-                Pointer.to(new int[] { out.width() }),
-                Pointer.to(new int[] { out.height() }),
-                Pointer.to(new float[] { value }),
+                Pointer.to(new int[]{out.width()}),
+                Pointer.to(new int[]{out.height()}),
+                Pointer.to(new float[]{value}),
                 Pointer.to(out.pointer())
-                );
+        );
     }
 
     @Override
@@ -52,7 +55,10 @@ public class Set extends Instruction {
             Float.parseFloat(args[3]);
         } catch (Exception ex) {
             try {
-                getVariableMtx(args[3]);
+                if (isDoublePrecision())
+                    getVariableMtxDouble(args[3]);
+                else
+                    getVariableMtxFloat(args[3]);
             } catch (Exception ex1) {
                 throw new IllegalStateException("Instruction format error!");
             }

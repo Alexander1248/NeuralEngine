@@ -6,9 +6,13 @@ import java.io.IOException;
 
 public class NeuralEngine extends MatrixEngine {
 
-    public NeuralEngine() throws IOException {
-        super();
-        loadModuleFromResources("neuralOperations", "kernels/neural.fatbin");
+    public NeuralEngine(boolean doublePrecision) throws IOException {
+        super(doublePrecision);
+        if (doublePrecision)
+            loadModuleFromResources("neuralOperations", "kernels/neuralDouble.fatbin");
+        else
+            loadModuleFromResources("neuralOperations", "kernels/neuralFloat.fatbin");
+
         loadFunction("relu", "neuralOperations");
         loadFunction("sigmoid", "neuralOperations");
         loadFunction("tangent", "neuralOperations");

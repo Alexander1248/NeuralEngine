@@ -28,12 +28,14 @@ public class GpuExecutor {
     // Compilation and execution instructions
     private final Map<String, String[]> scripts = new HashMap<>();
     private final Map<String, Instruction> instructions = new HashMap<>();
+    private final boolean doublePrecision;
 
     // Code parameters
     private final Map<String, Matrix> vars = new HashMap<>();
     private InstructionDescription[] code;
 
     private static CUcontext context;
+
     public static void initCuda() {
         setExceptionsEnabled(true);
 
@@ -45,6 +47,11 @@ public class GpuExecutor {
     }
     public static void closeCuda() {
         cuCtxDestroy(context);
+    }
+
+
+    public GpuExecutor(boolean doublePrecision) {
+        this.doublePrecision = doublePrecision;
     }
 
     public void loadProject(String filepath, ProjectIOFormat format) throws IOException {
@@ -82,13 +89,13 @@ public class GpuExecutor {
         format.save(new FileOutputStream(filepath), data, this);
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void addScript(String scriptMask, String script) {
         int pos = scriptMask.indexOf(" ");
         if (pos == -1) pos = scriptMask.length();
         scripts.put(scriptMask.substring(0, pos), new String[] { scriptMask.substring(pos + 1), script });
     }
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void loadScript(String filepath) throws IOException {
         FileInputStream reader = new FileInputStream(filepath);
         String data = new String(reader.readAllBytes()).replace("\r", "");
@@ -96,7 +103,7 @@ public class GpuExecutor {
         int pos = data.indexOf("\n");
         addScript(data.substring(0, pos), data.substring(pos));
     }
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void removeScript(String scriptMask) {
         scripts.remove(scriptMask);
     }
@@ -140,14 +147,32 @@ public class GpuExecutor {
 
     public void addVariable(String name, int width, int height) {
         CUdeviceptr ptr = new CUdeviceptr();
-        cuMemAlloc(ptr, (long) Sizeof.FLOAT * width * height);
+
+        if (doublePrecision)
+            cuMemAlloc(ptr, (long) Sizeof.DOUBLE * width * height);
+        else
+            cuMemAlloc(ptr, (long) Sizeof.FLOAT * width * height);
+
         vars.put(name, new Matrix(width, height, ptr));
     }
     public void addVariable(String name, int width, int height, float[] data) {
         if (data.length != width * height)
             throw new IllegalStateException("Matrix size not compare to array size");
         addVariable(name, width, height);
+
+        if (doublePrecision)
+            throw new IllegalStateException("Attempt to init single precision matrix in double precision system!");
         cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.FLOAT * width * height);
+    }
+    public void addVariable(String name, int width, int height, double[] data) {
+        if (data.length != width * height)
+            throw new IllegalStateException("Matrix size not compare to array size");
+        addVariable(name, width, height);
+
+
+        if (!doublePrecision)
+            throw new IllegalStateException("Attempt to init double precision matrix in single precision system!");
+        cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.DOUBLE * width * height);
     }
     public void loadDataInVariable(String name, float[] data) {
         Matrix mtx = vars.get(name);
@@ -157,7 +182,23 @@ public class GpuExecutor {
         int size = mtx.width() * mtx.height();
         if (data.length != size)
             throw new IllegalStateException("Matrix size not compare to array size");
+
+        if (doublePrecision)
+            throw new IllegalStateException("Attempt to init single precision matrix in double precision system!");
         cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.FLOAT * size);
+    }
+    public void loadDataInVariable(String name, double[] data) {
+        Matrix mtx = vars.get(name);
+        if (mtx == null)
+            throw new IllegalStateException("Matrix not exists!");
+
+        int size = mtx.width() * mtx.height();
+        if (data.length != size)
+            throw new IllegalStateException("Matrix size not compare to array size");
+
+        if (!doublePrecision)
+            throw new IllegalStateException("Attempt to init double precision matrix in single precision system!");
+        cuMemcpyHtoD(vars.get(name).pointer(), Pointer.to(data), (long) Sizeof.DOUBLE * size);
     }
 
     Matrix getVariableData(String name) {
@@ -176,12 +217,26 @@ public class GpuExecutor {
         cuMemFree(mtx.pointer());
         vars.remove(name);
     }
-    public float[] getVariable(String name) {
+    public float[] getVariableFloat(String name) {
         Matrix mtx = vars.get(name);
         if (mtx == null)
             throw new IllegalStateException("Variable not exists!");
         float[] data = new float[mtx.width() * mtx.height()];
+
+        if (doublePrecision)
+            throw new IllegalStateException("Attempt to get single precision matrix in double precision system!");
         cuMemcpyDtoH(Pointer.to(data), mtx.pointer(), (long) Sizeof.FLOAT * data.length);
+        return data;
+    }
+    public double[] getVariableDouble(String name) {
+        Matrix mtx = vars.get(name);
+        if (mtx == null)
+            throw new IllegalStateException("Variable not exists!");
+        double[] data = new double[mtx.width() * mtx.height()];
+
+        if (!doublePrecision)
+            throw new IllegalStateException("Attempt to get double precision matrix in single precision system!");
+        cuMemcpyDtoH(Pointer.to(data), mtx.pointer(), (long) Sizeof.DOUBLE * data.length);
         return data;
     }
     public int[] getVariableSizes(String name) {
@@ -359,8 +414,14 @@ public class GpuExecutor {
         GpuExecutor that = (GpuExecutor) object;
 
         if (!Objects.equals(vars, that.vars)) return false;
-        for (String s : vars.keySet())
-            if (!Arrays.equals(getVariable(s), that.getVariable(s))) return false;
+        if (doublePrecision) {
+            for (String s : vars.keySet())
+                if (!Arrays.equals(getVariableDouble(s), that.getVariableDouble(s))) return false;
+        }
+        else {
+            for (String s : vars.keySet())
+                if (!Arrays.equals(getVariableFloat(s), that.getVariableFloat(s))) return false;
+        }
 
         return Objects.equals(instructions, that.instructions) && Arrays.equals(code, that.code);
     }
@@ -390,5 +451,9 @@ public class GpuExecutor {
             result = 31 * result + Arrays.hashCode(args);
             return result;
         }
+    }
+
+    public boolean isDoublePrecision() {
+        return doublePrecision;
     }
 }
