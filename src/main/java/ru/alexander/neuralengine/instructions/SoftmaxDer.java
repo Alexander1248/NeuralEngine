@@ -20,14 +20,26 @@ public class SoftmaxDer extends Instruction {
         Matrix out = getVariable(args[0]);
         Matrix in = getVariable(args[1]);
 
-        startGPUTask("neuralOperations.softmaxDer",
-                in.width(), in.height(), 1,
-                Pointer.to(new int[] { in.width() }),
-                Pointer.to(new int[] { in.height() }),
-                Pointer.to(new float[] { Float.parseFloat(args[2]) }),
-                Pointer.to(in.pointer()),
-                Pointer.to(out.pointer())
-                );
+        if (isDoublePrecision()) {
+            startGPUTask("neuralOperations.softmaxDer",
+                    in.width(), in.height(), 1,
+                    Pointer.to(new int[]{in.width()}),
+                    Pointer.to(new int[]{in.height()}),
+                    Pointer.to(new double[]{Double.parseDouble(args[2])}),
+                    Pointer.to(in.pointer()),
+                    Pointer.to(out.pointer())
+            );
+        }
+        else {
+            startGPUTask("neuralOperations.softmaxDer",
+                    in.width(), in.height(), 1,
+                    Pointer.to(new int[]{in.width()}),
+                    Pointer.to(new int[]{in.height()}),
+                    Pointer.to(new float[]{Float.parseFloat(args[2])}),
+                    Pointer.to(in.pointer()),
+                    Pointer.to(out.pointer())
+            );
+        }
     }
 
     @Override
@@ -40,7 +52,10 @@ public class SoftmaxDer extends Instruction {
             throw new IllegalStateException("Variable not exists!");
 
         try {
-            Float.parseFloat(args[2]);
+            if (isDoublePrecision())
+                Double.parseDouble(args[2]);
+            else
+                Float.parseFloat(args[2]);
         } catch (Exception ex) {
             throw new IllegalStateException("Instruction format error!");
         }

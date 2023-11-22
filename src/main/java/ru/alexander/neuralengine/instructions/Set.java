@@ -19,23 +19,38 @@ public class Set extends Instruction {
     public void compute(String... args) {
         Matrix out = getVariable(args[0]);
 
-        float value;
-        try {
-            value = Float.parseFloat(args[3]);
-        } catch (Exception ex) {
-            if (isDoublePrecision())
-                value = (float) getVariableMtxDouble(args[3])[0];
-            else
-                value = getVariableMtxFloat(args[3])[0];
-        }
+        if (isDoublePrecision()) {
+            double value;
+            try {
+                value = Double.parseDouble(args[3]);
+            } catch (Exception ex) {
+                value = getVariableMtxDouble(args[3])[0];
+            }
 
-        startGPUTask("mtxOperations.set",
-                out.width(), out.height(), 1,
-                Pointer.to(new int[]{out.width()}),
-                Pointer.to(new int[]{out.height()}),
-                Pointer.to(new float[]{value}),
-                Pointer.to(out.pointer())
-        );
+            startGPUTask("mtxOperations.set",
+                    out.width(), out.height(), 1,
+                    Pointer.to(new int[]{out.width()}),
+                    Pointer.to(new int[]{out.height()}),
+                    Pointer.to(new double[]{value}),
+                    Pointer.to(out.pointer())
+            );
+        }
+        else {
+            float value;
+            try {
+                value = Float.parseFloat(args[3]);
+            } catch (Exception ex) {
+                value = getVariableMtxFloat(args[3])[0];
+            }
+
+            startGPUTask("mtxOperations.set",
+                    out.width(), out.height(), 1,
+                    Pointer.to(new int[]{out.width()}),
+                    Pointer.to(new int[]{out.height()}),
+                    Pointer.to(new float[]{value}),
+                    Pointer.to(out.pointer())
+            );
+        }
     }
 
     @Override
