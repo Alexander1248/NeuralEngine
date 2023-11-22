@@ -27,8 +27,15 @@ public class Sum extends Instruction {
         int size = in.width() * in.height();
 
         CUdeviceptr ptr = new CUdeviceptr();
-        cuMemAlloc(ptr, (long) Sizeof.FLOAT * size);
-        cuMemcpyDtoD(ptr, in.pointer(), (long) Sizeof.FLOAT * size);
+
+        if (isDoublePrecision()) {
+            cuMemAlloc(ptr, (long) Sizeof.DOUBLE * size);
+            cuMemcpyDtoD(ptr, in.pointer(), (long) Sizeof.DOUBLE * size);
+        }
+        else {
+            cuMemAlloc(ptr, (long) Sizeof.FLOAT * size);
+            cuMemcpyDtoD(ptr, in.pointer(), (long) Sizeof.FLOAT * size);
+        }
 
         int iterationSize = size - 1;
         do {
@@ -42,11 +49,18 @@ public class Sum extends Instruction {
         } while (iterationSize > 1);
 
 
-
-        float[] data = new float[size];
-        cuMemcpyDtoH(Pointer.to(data), ptr, (long) Sizeof.FLOAT * size);
-        data[0] += data[size - 1];
-        cuMemcpyHtoD(out.pointer(), Pointer.to(data), Sizeof.FLOAT);
+        if (isDoublePrecision()) {
+            double[] data = new double[size];
+            cuMemcpyDtoH(Pointer.to(data), ptr, (long) Sizeof.DOUBLE * size);
+            data[0] += data[size - 1];
+            cuMemcpyHtoD(out.pointer(), Pointer.to(data), Sizeof.DOUBLE);
+        }
+        else {
+            float[] data = new float[size];
+            cuMemcpyDtoH(Pointer.to(data), ptr, (long) Sizeof.FLOAT * size);
+            data[0] += data[size - 1];
+            cuMemcpyHtoD(out.pointer(), Pointer.to(data), Sizeof.FLOAT);
+        }
     }
 
     @Override
